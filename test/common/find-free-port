@@ -1,0 +1,12 @@
+#!/usr/bin/env python
+"Get an unused port number. Adapted from https://stackoverflow.com/a/45690594"
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+import socket
+from contextlib import closing
+
+with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+    s.bind(("localhost", 0))
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    print(s.getsockname()[1])
