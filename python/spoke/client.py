@@ -3,7 +3,9 @@ import asyncio
 from spoke import serial
 
 class Client:
-    def __init__(self, port=None):
+    def __init__(self, host=None, port=None):
+        if host is None:
+            host = os.getenv("SPOKEHOST", None) or "localhost"
         if port is None:
             port = os.getenv("SPOKEPORT", None) or 8888
 
@@ -11,6 +13,7 @@ class Client:
         self.reader = None
         self.writer = None
         self.port = port
+        self.host = host
         self.subs = {}
 
     async def publish(self, channel, msg):
@@ -29,7 +32,7 @@ class Client:
             del self.subs[channel]
 
     async def run(self, wait=False):
-        reader, writer = await asyncio.open_connection("127.0.0.1", self.port)
+        reader, writer = await asyncio.open_connection(self.host, self.port)
         self.connected = True
         self.reader = reader
         self.writer = writer

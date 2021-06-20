@@ -53,7 +53,7 @@ class Server:
             await sub.send(channel, msg)
 
     async def run(self):
-        self._server = await asyncio.start_server(self.handle_conn, "127.0.0.1", self._port)
+        self._server = await asyncio.start_server(self.handle_conn, "0.0.0.0", self._port)
         async with self._server:
             await self._server.serve_forever()
 
