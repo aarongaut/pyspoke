@@ -10,7 +10,7 @@ Include channel as a subscribe callback arg
 * Eg: `/foo/*/buzz`, `/**/buzz`, and `/**` all match
 * For now, ignore a `/` at beginning of channel path - in the future may allow "relative paths"
 * Multiple slashes and trailing slashes are ignored
-* Either wildcard must be the only thing at its level
+* Either wildcard must be the only thing at its level, otherwise it's treated as a normal character
 
 ## RPC
 
