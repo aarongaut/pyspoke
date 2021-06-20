@@ -1,1 +1,2 @@
+spoke_control: **
 foo: 5

@@ -2,6 +2,8 @@
 import sys
 
 channels = sys.argv[1:]
+if not channels:
+    channels = ["**"]
 
 import asyncio
 from spoke.client import Client

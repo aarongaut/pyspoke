@@ -1,6 +1,6 @@
 import os
 import asyncio
-from spoke import serialize
+import spoke
 
 class ClientHandle:
     def __init__(self, reader, writer, server):
@@ -15,14 +15,14 @@ class ClientHandle:
             except asyncio.exceptions.IncompleteReadError:
                 # TODO: unsubscribe all
                 break
-            channel, msg = serialize.bytes_to_msg(msg_data)
+            channel, msg = spoke.serialize.bytes_to_msg(msg_data)
             if channel == "spoke_control" and msg:
-                self.server.subscribe(self, msg)
+                self.server.subscribe(msg, self)
             if channel:
                 await self.server.publish(channel, msg)
 
     async def send(self, channel, msg):
-        msg_data = serialize.msg_to_bytes(channel, msg)
+        msg_data = spoke.serialize.msg_to_bytes(channel, msg)
         self.writer.write(msg_data)
         await self.writer.drain()
 
@@ -31,24 +31,17 @@ class Server:
         if port is None:
             port = os.getenv("SPOKEPORT", None) or 7181
         self._server = None
-        self._subs = {}
+        self._subs = spoke.routing.SubscriberTable()
         self._port = port
 
-    def get_subs(self, channel):
-        return list(self._subs.get(channel, []))
+    def subscribe(self, channel, client):
+        self._subs.add_rule(channel, client)
 
-    def subscribe(self, client, channel):
-        if channel not in self._subs:
-            self._subs[channel] = {client}
-        else:
-            self._subs[channel].add(client)
-
-    def unsubscribe(self, client, channel):
-        if channel in self._subs:
-            self._subs[channel] -= {client}
+    def unsubscribe(self, channel, client):
+        self._subs.remove_rule(channel, client)
 
     async def publish(self, channel, msg):
-        subs = self.get_subs(channel)
+        subs = self._subs.get_subs(channel)
         for sub in subs:
             await sub.send(channel, msg)
 

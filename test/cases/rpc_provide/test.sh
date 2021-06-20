@@ -13,8 +13,12 @@ printf "Starting echo client\n"
 SPOKEPORT=$port spoke-echo | tee artifacts/output.txt &
 sleep 0.2
 
+printf "Starting square provider\n"
+SPOKEPORT=$port python square.py &
+sleep 0.2
+
 printf "Publishing message\n"
-SPOKEPORT=$port spoke-publish foo 5 &
+SPOKEPORT=$port spoke-publish square/call 5 &
 sleep 0.2
 
 printf "Sending SIGTERM to server\n"

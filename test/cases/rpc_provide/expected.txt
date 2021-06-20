@@ -1,0 +1,4 @@
+spoke_control: **
+spoke_control: square/**/call
+square/call: 5
+square/result: 25

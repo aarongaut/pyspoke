@@ -28,13 +28,13 @@ Caller
 
 * Suppose caller is making a call to channel `/foo`
 * Subscribe to `/foo/-rpc/#/<ID>/result`, where `<ID>` is a locally generated unique id
-* Publish to `/foo/-rpc/#/<ID>`, return a future
+* Publish to `/foo/-rpc/#/<ID>/call`, return a future
 * Handle response on `/foo/-rpc/#/<ID>/result` then unsubscribe
 
 Callee
 
-* Subscribe to `/foo/**`
-* Reply on `channel + /result` where channel is whatever channel the message came in on
+* Subscribe to `/foo/**/call`
+* Reply on `/foo/**/result`
 
 Issue, how to assign a unique id to each client?
 Find if server handles it, but how can it work with multiple bridged servers?
