@@ -1,0 +1,10 @@
+#!/usr/bin/env python
+import asyncio
+from spoke.server import Server
+
+server = Server()
+
+try:
+    asyncio.run(server.run())
+except KeyboardInterrupt:
+    pass
