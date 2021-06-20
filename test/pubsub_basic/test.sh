@@ -12,9 +12,8 @@ sleep 0.2
 kill -15 $PID
 wait
 
-printf "Diff w/ expected output:"
-diff artifacts/output.txt expected.txt
+printf "Diffing output - <exp >got\n"
+diff expected.txt artifacts/output.txt
 exitcode=$?
-printf "\n"
 
 exit $exitcode
