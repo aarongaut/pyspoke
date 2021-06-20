@@ -6,8 +6,8 @@ channels = sys.argv[1:]
 import asyncio
 from spoke.client import Client
 
-async def echo(msg):
-    print(msg)
+async def echo(channel, msg):
+    print("{}: {}".format(channel, msg))
 
 async def main():
     client = Client()

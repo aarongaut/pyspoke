@@ -1,23 +1,24 @@
 import os
 import asyncio
-from spoke import serial
+import spoke
 
 class Client:
     def __init__(self, host=None, port=None):
         if host is None:
             host = os.getenv("SPOKEHOST", None) or "localhost"
         if port is None:
-            port = os.getenv("SPOKEPORT", None) or 8888
+            port = os.getenv("SPOKEPORT", None) or 7181
 
         self.connected = False
         self.reader = None
         self.writer = None
         self.port = port
         self.host = host
+        self.id = spoke.genid.uuid()
         self.subs = {}
 
     async def publish(self, channel, msg):
-        msg_data = serial.msg_to_bytes(channel, msg)
+        msg_data = spoke.serialize.msg_to_bytes(channel, msg)
         self.writer.write(msg_data)
         await self.writer.drain()
 
@@ -51,6 +52,6 @@ class Client:
             except asyncio.exceptions.IncompleteReadError:
                 self.connected = False
                 break
-            channel, msg = serial.bytes_to_msg(msg_data)
+            channel, msg = spoke.serialize.bytes_to_msg(msg_data)
             if channel in self.subs:
-                await self.subs[channel](msg)
+                await self.subs[channel](channel, msg)
