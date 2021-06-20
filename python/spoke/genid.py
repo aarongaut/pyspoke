@@ -8,5 +8,5 @@ def luid():
     global next_id
     id = next_id
     next_id += 1
-    return str(next_id)
+    return hex(id)[2:]
 
