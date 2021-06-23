@@ -5,7 +5,7 @@ import spoke
 class Client:
     def __init__(self, host=None, port=None):
         if host is None:
-            host = os.getenv("SPOKEHOST", None) or "localhost"
+            host = os.getenv("SPOKEHOST", None) or "127.0.0.1"
         if port is None:
             port = os.getenv("SPOKEPORT", None) or 7181
 
@@ -37,11 +37,11 @@ class Client:
             res_val = await callback(call_channel, msg)
             res_channel = call_channel.rstrip("call") + "result"
             await self.publish(res_channel, res_val)
-        await self.subscribe(channel + "/**/call", _provide)
+        await self.subscribe(channel + "/-rpc/**/call", _provide)
 
     async def call(self, channel, msg):
         future = asyncio.Future()
-        channel_head = "/".join([channel, self.id, spoke.genid.luid()])
+        channel_head = "/".join([channel, "-rpc", self.id, spoke.genid.luid()])
         pub_channel = "/".join([channel_head, "call"])
         sub_channel = "/".join([channel_head, "result"])
         sub_id = [None]

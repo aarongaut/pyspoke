@@ -1,6 +1,13 @@
 # TODOs
 
-Include channel as a subscribe callback arg
+* Make everything more robust
+    * Disconnecting/reconnecting stuff shouldn't break anything and reconnects should be automatic
+        * When reconnecting to a server, need to sync up subscriptions
+    * errors in RPC should be handled gracefully on both ends
+    * Be more disciplined about when to await, create task or just make synchronous calls
+* Flesh out control message
+    * Implement unsubscribe
+
 
 ## Support wildcard subscriptions w/ nested channels
 

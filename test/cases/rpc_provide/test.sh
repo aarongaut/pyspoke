@@ -18,7 +18,7 @@ SPOKEPORT=$port python square.py &
 sleep 0.2
 
 printf "Publishing message\n"
-SPOKEPORT=$port spoke-publish square/call 5 &
+SPOKEPORT=$port spoke-publish square/-rpc/call 5 &
 sleep 0.2
 
 printf "Sending SIGTERM to server\n"
