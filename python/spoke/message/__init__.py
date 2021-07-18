@@ -1,3 +1,3 @@
 from . import client
-from . import error
+from . import serialize
 from . import server

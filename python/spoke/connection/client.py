@@ -42,6 +42,16 @@ class Client:
     async def __reset_connection(self):
         # Shut down connection?
         async with self.__lock:
+            if self.__connection:
+                _, writer = self.__connection
+                writer.close()
+                try:
+                    await writer.wait_closed()
+                except ExpectedReadErrors:
+                    pass
+                except Exception as e:
+                    print("UNEXPECTED CLIENT ERROR 4", type(e), e)
+                    raise
             self.__connection = None
         await self.handle_disconnect()
 

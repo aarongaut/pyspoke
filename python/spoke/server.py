@@ -15,14 +15,14 @@ class ClientHandle:
             except asyncio.exceptions.IncompleteReadError:
                 # TODO: unsubscribe all
                 break
-            channel, msg = spoke.serialize.bytes_to_msg(msg_data)
+            channel, msg = spoke.pubsub.serialize.bytes_to_msg(msg_data)
             if channel == "spoke_control" and msg:
                 self.server.subscribe(msg, self)
             if channel:
                 await self.server.publish(channel, msg)
 
     async def send(self, channel, msg):
-        msg_data = spoke.serialize.msg_to_bytes(channel, msg)
+        msg_data = spoke.pubsub.serialize.msg_to_bytes(channel, msg)
         self.writer.write(msg_data)
         await self.writer.drain()
 

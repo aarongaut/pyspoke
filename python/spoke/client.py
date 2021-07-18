@@ -18,7 +18,7 @@ class Client:
         self.subs = spoke.routing.SubscriberTable()
 
     async def publish(self, channel, msg):
-        msg_data = spoke.serialize.msg_to_bytes(channel, msg)
+        msg_data = spoke.pubsub.serialize.msg_to_bytes(channel, msg)
         self.writer.write(msg_data)
         await self.writer.drain()
 
@@ -73,6 +73,6 @@ class Client:
             except asyncio.exceptions.IncompleteReadError:
                 self.connected = False
                 break
-            channel, msg = spoke.serialize.bytes_to_msg(msg_data)
+            channel, msg = spoke.pubsub.serialize.bytes_to_msg(msg_data)
             for callback in self.subs.get_subs(channel):
                 await callback(channel, msg)

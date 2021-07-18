@@ -1,7 +1,7 @@
 import asyncio
 import spoke
 
-class SingleServer(spoke.connection.server.SingleServer):
+class SingleServer(spoke.message.server.SingleServer):
     async def handle_connect(self):
         print("server.handle_connect")
         if "clients" not in self._context:
@@ -17,6 +17,6 @@ class SingleServer(spoke.connection.server.SingleServer):
         for client in self._context["clients"]:
             await client.send(data)
 
-server = spoke.connection.server.Server(single_server_class=SingleServer)
+server = spoke.message.server.Server(single_server_class=SingleServer)
 
 asyncio.run(server.run())

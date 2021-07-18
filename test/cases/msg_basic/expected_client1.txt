@@ -1,0 +1,14 @@
+sending: 0
+Connected
+recv value:  0
+sending: 1
+recv value:  1
+sending: 2
+recv value:  2
+recv value:  0
+sending: 3
+recv value:  3
+recv value:  1
+sending: 4
+recv value:  4
+recv value:  2
