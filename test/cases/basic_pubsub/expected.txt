@@ -1,2 +1,2 @@
-spoke_control: **
+-control/subscribe: **
 foo: 5

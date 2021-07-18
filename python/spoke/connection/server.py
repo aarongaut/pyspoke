@@ -10,6 +10,7 @@ class SingleServer:
         self._context = context
 
     async def run(self):
+        await self.handle_connect()
         while True:
             try:
                 data = await self.__reader.read(1024)
@@ -73,4 +74,3 @@ class Server:
     async def on_connect(self, reader, writer):
         client = self.__single_server_class(reader, writer, self.__context)
         asyncio.create_task(client.run())
-        await client.handle_connect()

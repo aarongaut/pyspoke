@@ -1,4 +1,4 @@
-from spoke.routing import tokenize
+from spoke.pubsub.route import tokenize
 
 class TestFailure(AssertionError):
     pass

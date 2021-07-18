@@ -1,5 +1,5 @@
 import asyncio
-from spoke.client import Client
+from spoke.pubsub.client import Client
 
 arg = 5
 

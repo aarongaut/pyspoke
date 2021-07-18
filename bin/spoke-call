@@ -6,4 +6,4 @@ import spoke
 channel, msg_str = sys.argv[1:]
 msg = json.loads(msg_str)
 
-print(spoke.sync.call(channel, msg))
+print(spoke.simple.call(channel, msg))

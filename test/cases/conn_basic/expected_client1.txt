@@ -1,5 +1,5 @@
-sending: client1 0
 Connected
+sending: client1 0
 recv:  client1 0
 sending: client1 1
 recv:  client1 1

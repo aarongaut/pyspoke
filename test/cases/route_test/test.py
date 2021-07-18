@@ -1,4 +1,4 @@
-from spoke.routing import Entry, tokenize
+from spoke.pubsub.route import Route, tokenize
 
 class TestFailure(AssertionError):
     pass
@@ -165,7 +165,7 @@ for case in cases:
     rule = case["rule"]
     channel = case["channel"]
     expected = case["expected"]
-    entry = Entry(tokenize(rule), None)
+    entry = Route(tokenize(rule), None)
     result = entry.test(tokenize(channel))
     if result != expected:
         msg = "Failed case {} - expected {}, got {}".format(case, expected, result)

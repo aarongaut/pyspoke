@@ -1,4 +1,4 @@
-spoke_control: **
-spoke_control: square/-rpc/**/call
+-control/subscribe: **
+-control/subscribe: square/-rpc/**/call
 square/-rpc/call: 5
 square/-rpc/result: 25

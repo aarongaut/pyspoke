@@ -6,7 +6,7 @@ if not channels:
     channels = ["**"]
 
 import asyncio
-from spoke.client import Client
+from spoke.pubsub.client import Client
 
 async def echo(channel, msg):
     print("{}: {}".format(channel, msg))
@@ -15,7 +15,8 @@ async def main():
     client = Client()
     await client.run()
     await asyncio.gather(*[client.subscribe(x, echo) for x in channels])
-    await client.wait()
+    while True:
+        await asyncio.sleep(1)
 
 try:
     asyncio.run(main())

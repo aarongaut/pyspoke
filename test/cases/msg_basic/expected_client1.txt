@@ -1,5 +1,5 @@
-sending: 0
 Connected
+sending: 0
 recv value:  0
 sending: 1
 recv value:  1

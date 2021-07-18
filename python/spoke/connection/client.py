@@ -12,9 +12,11 @@ class Client:
         self.__host = host
         self.__port = port
         self.__connection = None
-        self.__lock = asyncio.Lock()
+        self.__lock = None
 
     async def run(self):
+        self.__lock = asyncio.Lock()
+        await self.__get_connection()
         self.__task = asyncio.create_task(self.__run_inner())
 
     async def handle_connect(self):
@@ -28,15 +30,17 @@ class Client:
 
     async def __get_connection(self):
         async with self.__lock:
+            required_connection = self.__connection is None
             while self.__connection is None:
                 try:
                     self.__connection = await asyncio.open_connection(self.__host, self.__port)
-                    await self.handle_connect()
                 except ExpectedConnectErrors:
                     await asyncio.sleep(0.1)
                 except Exception as e:
                     print("UNEXPECTED CLIENT ERROR 1", type(e), e)
                     raise
+        if required_connection:
+            await self.handle_connect()
         return self.__connection
 
     async def __reset_connection(self):

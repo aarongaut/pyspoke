@@ -6,15 +6,17 @@ port=$(../../common/find-free-port)
 
 printf "Starting server on port $port\n"
 SPOKEPORT=$port spoke &
-PID=$!
+SERVER_PID=$!
 sleep 0.2
 
 printf "Starting echo client\n"
-SPOKEPORT=$port spoke-echo | tee artifacts/output.txt &
+PYTHONUNBUFFERED=1 SPOKEPORT=$port spoke-echo > artifacts/output.txt &
+ECHO_PID=$!
 sleep 0.2
 
 printf "Starting square provider\n"
 SPOKEPORT=$port python square.py &
+SQUARE_PID=$!
 sleep 0.2
 
 printf "Publishing message\n"
@@ -22,7 +24,13 @@ SPOKEPORT=$port spoke-publish square/-rpc/call 5 &
 sleep 0.2
 
 printf "Sending SIGTERM to server\n"
-kill -15 $PID
+kill -15 $SERVER_PID
+
+printf "Sending SIGTERM to echo\n"
+kill -15 $ECHO_PID
+
+printf "Sending SIGTERM to square\n"
+kill -15 $SQUARE_PID
 
 printf "Waiting for everything to shutdown\n"
 wait

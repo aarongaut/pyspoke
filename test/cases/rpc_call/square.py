@@ -1,5 +1,5 @@
 import asyncio
-from spoke.client import Client
+from spoke.pubsub.client import Client
 
 async def square(channel, msg):
     return msg * msg
@@ -8,7 +8,8 @@ async def main():
     client = Client()
     await client.run()
     await client.provide("square", square)
-    await client.wait()
+    while True:
+        await asyncio.sleep(1)
 
 try:
     asyncio.run(main())

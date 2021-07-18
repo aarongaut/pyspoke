@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import asyncio
-from spoke.server import Server
+from spoke.pubsub.server import Server
 
 server = Server()
 
