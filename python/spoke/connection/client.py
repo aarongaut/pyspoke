@@ -3,6 +3,7 @@ import asyncio
 
 from .error import ExpectedConnectErrors, ExpectedReadErrors, ExpectedWriteErrors
 
+
 class Client:
     def __init__(self, host=None, port=None):
         if host is None:
@@ -33,7 +34,9 @@ class Client:
             required_connection = self.__connection is None
             while self.__connection is None:
                 try:
-                    self.__connection = await asyncio.open_connection(self.__host, self.__port)
+                    self.__connection = await asyncio.open_connection(
+                        self.__host, self.__port
+                    )
                 except ExpectedConnectErrors:
                     await asyncio.sleep(0.1)
                 except Exception as e:

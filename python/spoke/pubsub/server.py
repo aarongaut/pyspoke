@@ -43,7 +43,9 @@ class MessageSingleServerPubSub(spoke.message.server.SingleServer):
 
 class SingleServer:
     def __init__(self, reader, writer, context):
-        self.__level2_single_server = MessageSingleServerPubSub(self, reader, writer, context)
+        self.__level2_single_server = MessageSingleServerPubSub(
+            self, reader, writer, context
+        )
 
     async def run(self):
         await self.__level2_single_server.run()

@@ -23,14 +23,20 @@ class ConnectionSingleServerJSON(spoke.connection.server.SingleServer):
             try:
                 msg = spoke.message.serialize.bytes_to_msg(data)
             except json.decoder.JSONDecodeError:
-                print("Ignoring malformed message from client (not valid JSON): {}".format(data))
+                print(
+                    "Ignoring malformed message from client (not valid JSON): {}".format(
+                        data
+                    )
+                )
             else:
                 await self.__wrapper.handle_recv(msg)
 
 
 class SingleServer:
     def __init__(self, reader, writer, context):
-        self.__level1_single_server = ConnectionSingleServerJSON(self, reader, writer, context)
+        self.__level1_single_server = ConnectionSingleServerJSON(
+            self, reader, writer, context
+        )
         self._context = context
 
     async def run(self):

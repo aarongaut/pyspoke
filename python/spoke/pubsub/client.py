@@ -1,6 +1,7 @@
 import asyncio
 import spoke
 
+
 class MessageClientPubSub(spoke.message.client.Client):
     def __init__(self, wrapper, host=None, port=None):
         super().__init__(host, port)
@@ -39,10 +40,12 @@ class Client:
 
     async def provide(self, channel, callback):
         channel = spoke.pubsub.route.canonical(channel)
+
         async def _provide(call_channel, msg):
             res_val = await callback(call_channel, msg)
             res_channel = call_channel.rstrip("call") + "result"
             await self.publish(res_channel, res_val)
+
         await self.subscribe(channel + "/-rpc/**/call", _provide)
 
     async def call(self, channel, payload):
@@ -51,9 +54,11 @@ class Client:
         channel_head = "/".join([channel, "-rpc", self.id, spoke.genid.luid()])
         pub_channel = "/".join([channel_head, "call"])
         sub_channel = "/".join([channel_head, "result"])
+
         async def _call(_, res_msg):
             future.set_result(res_msg)
             await self.unsubscribe(sub_channel)
+
         await self.subscribe(sub_channel, _call)
         await self.publish(pub_channel, payload)
         return future

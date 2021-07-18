@@ -1,7 +1,9 @@
 from spoke.pubsub.route import Route, tokenize
 
+
 class TestFailure(AssertionError):
     pass
+
 
 cases = [
     {
@@ -172,4 +174,3 @@ for case in cases:
         raise TestFailure(msg)
 
 print("All {} cases passed".format(len(cases)))
-

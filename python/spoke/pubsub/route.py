@@ -15,8 +15,10 @@ def tokenize(channel):
         run.append("**")
     return tuple(sum(runs, []))
 
+
 def canonical(channel):
     return Route(tokenize(channel), None).channel()
+
 
 class Route:
     def __init__(self, tokens, destination=None):
@@ -56,6 +58,7 @@ class Route:
 
     def channel(self):
         return "/".join(self.tokens)
+
 
 class RoutingTable:
     def __init__(self):

@@ -3,6 +3,7 @@ import os
 
 from .error import ExpectedReadErrors, ExpectedWriteErrors
 
+
 class SingleServer:
     def __init__(self, reader, writer, context):
         self.__reader = reader
@@ -57,6 +58,7 @@ class SingleServer:
     async def handle_disconnect(self):
         pass
 
+
 class Server:
     def __init__(self, port=None, single_server_class=SingleServer):
         if port is None:
@@ -67,7 +69,9 @@ class Server:
         self.__context = {}
 
     async def run(self):
-        self.__asyncio_server = await asyncio.start_server(self.on_connect, "0.0.0.0", self.__port)
+        self.__asyncio_server = await asyncio.start_server(
+            self.on_connect, "0.0.0.0", self.__port
+        )
         async with self.__asyncio_server:
             await self.__asyncio_server.serve_forever()
 

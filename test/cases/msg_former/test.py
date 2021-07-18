@@ -1,6 +1,7 @@
 import random
 import spoke
 
+
 def slice_and_dice(string, seed=None):
     random.seed(seed)
     cuts = random.randrange(1, 6)
@@ -9,8 +10,13 @@ def slice_and_dice(string, seed=None):
         part_idx = random.randrange(0, len(parts))
         part = parts[part_idx]
         byte_idx = random.randrange(0, len(part) + 1)
-        parts = parts[:part_idx] + [part[:byte_idx], part[byte_idx:]] + parts[part_idx + 1:]
+        parts = (
+            parts[:part_idx]
+            + [part[:byte_idx], part[byte_idx:]]
+            + parts[part_idx + 1 :]
+        )
     return parts
+
 
 cases = [
     {
@@ -18,13 +24,15 @@ cases = [
         "expected": [b"hello\x00", b"world\x00"],
     },
     {
-        "input": b"hello\x00\00world\x00junk",
+        "input": b"hello\x00\x00world\x00junk",
         "expected": [b"hello\x00", b"\x00", b"world\x00"],
     },
 ]
 
+
 class TestFailure(AssertionError):
     pass
+
 
 reps = 100
 for case in cases:

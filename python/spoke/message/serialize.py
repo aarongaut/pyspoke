@@ -1,10 +1,14 @@
 import json
+
+
 def msg_to_bytes(msg):
     msg_str = json.dumps(msg)
     return (msg_str).encode("utf8") + b"\0"
 
+
 def bytes_to_msg(data):
     return json.loads(data[:-1])
+
 
 class MessageFormer:
     MSG_SEP = b"\x00"

@@ -1,5 +1,7 @@
 import spoke
+
 count = 10000
+
 
 def scope_luids():
     print("Generating {} luids".format(count))
@@ -8,7 +10,10 @@ def scope_luids():
     print("Here's a sample: {}".format(" ".join(tokens)))
     assert len(set(luids)) == count
     print("All unique")
+
+
 scope_luids()
+
 
 def scope_uuids():
     print("\nGenerating {} uuids".format(count))
@@ -17,4 +22,6 @@ def scope_uuids():
     print("Here's a sample: {}".format(" ".join(tokens)))
     assert len(set(uuids)) == count
     print("All unique")
+
+
 scope_uuids()

@@ -3,6 +3,7 @@ import os
 import asyncio
 import spoke
 
+
 class ConnectionClientJSON(spoke.connection.client.Client):
     def __init__(self, wrapper, host=None, port=None):
         super().__init__(host, port)
@@ -23,7 +24,11 @@ class ConnectionClientJSON(spoke.connection.client.Client):
             try:
                 msg = spoke.message.serialize.bytes_to_msg(data)
             except json.decoder.JSONDecodeError:
-                print("Ignoring malformed message from server (not valid JSON): {}".format(data))
+                print(
+                    "Ignoring malformed message from server (not valid JSON): {}".format(
+                        data
+                    )
+                )
             else:
                 await self.__wrapper.handle_recv(msg)
 
@@ -47,4 +52,3 @@ class Client:
 
     async def handle_recv(self, msg):
         pass
-
