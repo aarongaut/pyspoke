@@ -1,0 +1,13 @@
+sending: client2 0
+Connected
+recv:  client2 0
+recv:  client1 3
+sending: client2 1
+recv:  client2 1
+recv:  client1 4
+sending: client2 2
+recv:  client2 2
+sending: client2 3
+recv:  client2 3
+sending: client2 4
+recv:  client2 4

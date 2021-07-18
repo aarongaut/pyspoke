@@ -8,6 +8,61 @@
 * Flesh out control message
     * Implement unsubscribe
 
+## client/server rewrite
+
+Separate into three layers
+
+### connection layer (layer 1)
+
+Maintains a TCP connection
+
+Parameters for:
+* host/port
+* connection timeout
+Callbacks for:
+* on first connect
+* on reconnect
+* on disconnect
+* on recv bytes
+    * Callback that takes bytes object as arg
+Methods for:
+* send bytes
+
+### message layer (layer 2)
+
+Handles message packing/unpacking (JSON)
+
+* Wrapper for layer 1
+* Handles splitting messages by "\0"
+* Handles parsing/dumping json
+
+### pub/sub layer (layer 3)
+
+Adds pub/sub and RPC functionality
+
+* Sends control messages for subscribing/unsubscribing
+* Maintains routing/callback table for subscriptions
+* Resends subscriptions on reconnect
+
+## Robustness
+
+Three aspects to robustness
+
+### Robust handling of disconnections
+
+* Server detects when a client has disconnected and deletes client (and subscriptions) from memory
+* Client detects when a connection is dropped/fails and will keep trying to reconnect
+
+### Subscription synchronization
+
+* Client should be the source of truth on its list of subscriptions
+* Send full list to server upon connecting
+
+### RCP failure recovery
+
+* Caller should use a timeout
+* Think about an ack message that is published when the callee receives the message to show it is there
+    * Distinguish between a call nobody's listening to and a call that has an error when executed
 
 ## Support wildcard subscriptions w/ nested channels
 
