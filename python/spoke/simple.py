@@ -18,7 +18,7 @@ def call(channel, msg, host=None, port=None):
         future = await client.call(channel, msg)
         await future
         result[0] = future.result()
-    asyncio.run(run(), debug=True)
+    asyncio.run(run())
     return result[0]
 
 def publish(channel, msg, host=None, port=None):
@@ -26,4 +26,4 @@ def publish(channel, msg, host=None, port=None):
     async def run():
         await client.run()
         await client.publish(channel, msg)
-    asyncio.run(run(), debug=True)
+    asyncio.run(run())
