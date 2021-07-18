@@ -15,10 +15,12 @@ class MessageSingleServerPubSub(spoke.message.server.SingleServer):
 
         def _subscribe(channel):
             if isinstance(channel, str):
+                channel = spoke.pubsub.route.canonical(channel)
                 self._table.add_rule(channel)
 
         def _unsubscribe(channel):
             if isinstance(channel, str):
+                channel = spoke.pubsub.route.canonical(channel)
                 self._table.remove_rule(channel)
 
         self.__control_table.add_rule("-control/subscribe", _subscribe)
