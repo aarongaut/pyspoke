@@ -15,18 +15,19 @@ def tokenize(channel):
         run.append("**")
     return tuple(sum(runs, []))
 
+def canonical(channel):
+    return Route(tokenize(channel), None).channel()
 
-class Entry:
-    def __init__(self, tokens, sub, sub_id=None):
+class Route:
+    def __init__(self, tokens, destination=None):
         self.tokens = tokens
-        self.sub = sub
-        self.sub_id = sub_id or sub
+        self.destination = destination
 
     def __eq__(self, other):
-        return self.tokens == other.tokens and self.sub_id == other.sub_id
+        return self.tokens == other.tokens
 
     def __hash__(self):
-        return hash((hash(self.tokens) * 73) ^ (hash(self.sub_id) * 71))
+        return hash(self.tokens)
 
     def test(self, tokens):
         stack = [(0, 0)]
@@ -53,35 +54,26 @@ class Entry:
                 continue
         return False
 
-class SubscriberTable:
+    def channel(self):
+        return "/".join(self.tokens)
+
+class RoutingTable:
     def __init__(self):
-        self.entries = set()
+        self.routes = set()
 
-    def add_rule(self, channel, sub, sub_id=None):
+    def add_rule(self, channel, destination=None):
         tokens = tokenize(channel)
-        entry = Entry(tokens, sub, sub_id)
-        self.entries.add(entry)
+        route = Route(tokens, destination)
+        self.routes.add(route)
+        return route
 
-    def remove_rule(self, channel, sub_id):
+    def remove_rule(self, channel):
         tokens = tokenize(channel)
-        entry = Entry(tokens, None, sub_id)
-        if entry in self.entries:
-            self.entries.remove(entry)
+        route = Route(tokens, None)
+        if route in self.routes:
+            self.routes.remove(route)
+        return route
 
-    def remove_sub(self, sub_id):
-        condemned = []
-        for entry in self.entries:
-            if entry.sub_id == sub_id:
-                condemned.append(entry)
-        for x in condemned:
-            self.entries.remove(x)
-
-    def get_subs(self, channel):
+    def get_destinations(self, channel):
         tokens = tokenize(channel)
-        subs = set()
-        for entry in self.entries:
-            if entry.sub in subs:
-                continue
-            if entry.test(tokens):
-                subs.add(entry.sub)
-        return list(subs)
+        return [e.destination for e in self.routes if e.test(tokens)]
