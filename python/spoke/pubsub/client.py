@@ -61,11 +61,13 @@ class Client:
                 await self.unsubscribe(sub_channel)
 
         if timeout:
+
             async def _handle_timeout():
                 await asyncio.sleep(timeout)
                 if not future.done():
                     future.set_exception(TimeoutError())
                     await self.unsubscribe(sub_channel)
+
             asyncio.create_task(_handle_timeout())
 
         await self.subscribe(sub_channel, _handle_response)

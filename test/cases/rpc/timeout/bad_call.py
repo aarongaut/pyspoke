@@ -1,6 +1,7 @@
 import asyncio
 from spoke.pubsub.client import Client
 
+
 async def main():
     client = Client()
     await client.run()
@@ -11,5 +12,6 @@ async def main():
         print("Got expected TimeoutError")
     else:
         raise TestFailure("Didn't get a TimeoutError")
+
 
 asyncio.run(main())
