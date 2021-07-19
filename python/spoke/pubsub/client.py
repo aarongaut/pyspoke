@@ -48,17 +48,26 @@ class Client:
 
         await self.subscribe(channel + "/-rpc/**/call", _provide)
 
-    async def call(self, channel, payload):
+    async def call(self, channel, payload, timeout=None):
         future = asyncio.Future()
         channel = spoke.pubsub.route.canonical(channel)
         channel_head = "/".join([channel, "-rpc", self.id, spoke.genid.luid()])
         pub_channel = "/".join([channel_head, "call"])
         sub_channel = "/".join([channel_head, "result"])
 
-        async def _call(_, res_msg):
-            future.set_result(res_msg)
-            await self.unsubscribe(sub_channel)
+        async def _handle_response(_, res_msg):
+            if not future.done():
+                future.set_result(res_msg)
+                await self.unsubscribe(sub_channel)
 
-        await self.subscribe(sub_channel, _call)
+        if timeout:
+            async def _handle_timeout():
+                await asyncio.sleep(timeout)
+                if not future.done():
+                    future.set_exception(TimeoutError())
+                    await self.unsubscribe(sub_channel)
+            asyncio.create_task(_handle_timeout())
+
+        await self.subscribe(sub_channel, _handle_response)
         await self.publish(pub_channel, payload)
         return future

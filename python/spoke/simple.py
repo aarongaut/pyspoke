@@ -11,13 +11,13 @@ import spoke
 import asyncio
 
 
-def call(channel, msg, host=None, port=None):
+def call(channel, msg, host=None, port=None, timeout=None):
     client = spoke.pubsub.client.Client(host=host, port=port)
     result = [None]
 
     async def run():
         await client.run()
-        future = await client.call(channel, msg)
+        future = await client.call(channel, msg, timeout=timeout)
         await future
         result[0] = future.result()
 
