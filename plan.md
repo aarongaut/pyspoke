@@ -1,9 +1,17 @@
 # TODOs
 
+* Consider adding a header (room for adding new metadata fields, where channel is just one item)
 * Make everything more robust
+    * Add spotty-spoke command for help with testing (repeatedly starts and stops a pubsub spoke server)
     * errors in RPC should be handled gracefully on both ends
     * Be more disciplined about when to await, create task or just make synchronous calls
 * Bridge to other servers
+    * Separate process that connects to both servers with clients, subscribes to `**` for both
+    * How to handle -control messages (and other messages that shouldn't be forwarded)?
+        * Bridge decides not to forward some messages based on channel
+        * Include an optional `"no_forward"` value in full msg?
+
+# Old notes
 
 ## client/server rewrite
 

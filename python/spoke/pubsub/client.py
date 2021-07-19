@@ -41,10 +41,14 @@ class Client:
     async def provide(self, channel, callback):
         channel = spoke.pubsub.route.canonical(channel)
 
-        async def _provide(call_channel, msg):
-            res_val = await callback(call_channel, msg)
+        async def _provide(call_channel, call_payload):
             res_channel = call_channel.rstrip("call") + "result"
-            await self.publish(res_channel, res_val)
+            res_payload = {}
+            try:
+                res_payload["okay"] = await callback(call_channel, call_payload)
+            except Exception as e:
+                res_payload["error"] = str(e)
+            await self.publish(res_channel, res_payload)
 
         await self.subscribe(channel + "/-rpc/**/call", _provide)
 
@@ -57,7 +61,14 @@ class Client:
 
         async def _handle_response(_, res_msg):
             if not future.done():
-                future.set_result(res_msg)
+                if "okay" in res_msg:
+                    future.set_result(res_msg["okay"])
+                elif "error" in res_msg:
+                    err = spoke.pubsub.error.RemoteCallError(res_msg["error"])
+                    future.set_exception(err)
+                else:
+                    err = spoke.pubsub.error.RemoteCallError("Malformed response")
+                    future.set_exception(err)
                 await self.unsubscribe(sub_channel)
 
         if timeout:

@@ -1,4 +1,4 @@
 -control/subscribe: **
 -control/subscribe: square/-rpc/**/call
 square/-rpc/call: 5
-square/-rpc/result: 25
+square/-rpc/result: {'okay': 25}
