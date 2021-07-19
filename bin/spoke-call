@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import json
 import spoke
+import sys
 
 import argparse
 
@@ -15,4 +16,12 @@ if args.payload is None:
 else:
     payload = json.loads(args.payload)
 
-print(spoke.simple.call(args.channel, payload, timeout=args.timeout))
+try:
+    print(spoke.simple.call(args.channel, payload, timeout=args.timeout))
+except TimeoutError:
+    print("Timeout")
+    sys.exit(1)
+except spoke.pubsub.error.RemoteCallError as e:
+    msg = "Error: {}"
+    print(msg.format(e))
+    sys.exit(1)
