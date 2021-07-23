@@ -33,12 +33,17 @@ class MessageSingleServerPubSub(spoke.message.server.SingleServer):
         self._context["clients"].remove(self)
 
     async def handle_recv(self, msg):
-        channel, payload = spoke.pubsub.msgpack.unpack_msg(msg)
-        for destination in self.__control_table.get_destinations(channel):
-            destination(payload)
-        for client in self._context["clients"]:
-            if client._table.get_destinations(channel):
-                await client.send(msg)
+        try:
+            channel, payload = spoke.pubsub.msgpack.unpack_msg(msg)
+        except ValueError as e:
+            msg = "Ignoring malformed message from client: {}"
+            print(msg.format(e))
+        else:
+            for destination in self.__control_table.get_destinations(channel):
+                destination(payload)
+            for client in self._context["clients"]:
+                if client._table.get_destinations(channel):
+                    await client.send(msg)
 
 
 class SingleServer:

@@ -1,0 +1,4 @@
+Ignoring malformed message from client: channel is not a string
+Ignoring malformed message from client: channel is not a string
+Ignoring malformed message from client: channel is not a string
+Ignoring malformed message from client: channel is not a string

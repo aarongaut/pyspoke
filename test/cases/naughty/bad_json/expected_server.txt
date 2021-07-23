@@ -1,0 +1,2 @@
+Ignoring malformed message from client (not valid JSON): Expecting value: line 1 column 1 (char 0)
+Ignoring malformed message from client (not valid JSON): 'utf-8' codec can't decode byte 0xbe in position 2: invalid start byte
