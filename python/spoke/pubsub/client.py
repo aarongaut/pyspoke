@@ -6,10 +6,13 @@ class MessageClientPubSub(spoke.message.client.Client):
     def __init__(self, wrapper, host=None, port=None):
         super().__init__(host, port)
         self.__wrapper = wrapper
+        self.__bounce = True
 
     async def handle_connect(self):
         for route in self.__wrapper._table.routes:
             await self.__wrapper.publish("-control/subscribe", route.channel())
+        if not self.__bounce:
+            self.__wrapper.publich("-control/bounce", False)
 
     async def handle_recv(self, msg):
         channel, payload = spoke.pubsub.msgpack.unpack_msg(msg)
@@ -37,6 +40,15 @@ class Client:
     async def unsubscribe(self, channel):
         rule = self._table.remove_rule(channel)
         await self.publish("-control/unsubscribe", rule.channel())
+
+    async def bounce(self, flag):
+        """If False, tells the server not to send back messages
+        published by this client, even if this client is subscribed
+        to that channel.
+
+        """
+        self.__bounce = bool(flag)
+        await self.publish("-control/bounce", bool(self.__bounce))
 
     async def provide(self, channel, callback):
         channel = spoke.pubsub.route.canonical(channel)

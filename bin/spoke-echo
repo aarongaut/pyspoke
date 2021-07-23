@@ -1,24 +1,37 @@
 #!/usr/bin/env python
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-o", "--output-path", help="File to write to in addition to printing")
+parser.add_argument("-l", "--label", help="Label to include at beginning of each output")
+parser.add_argument("channel", nargs="*", default=["**"])
+args = parser.parse_args()
+
 import sys
-
-channels = sys.argv[1:]
-if not channels:
-    channels = ["**"]
-
 import asyncio
-from spoke.pubsub.client import Client
+import atexit
+import spoke
+
+if args.output_path:
+    ostream = open(args.output_path, "w")
+else:
+    ostream = None
 
 async def echo(channel, msg):
-    print("{}: {}".format(channel, msg))
+    if args.label:
+        msg = "[{}] {}: {}\n".format(args.label, channel, msg)
+    else:
+        msg = "{}: {}\n".format(channel, msg)
+    print(msg, end="")
+    if ostream:
+        ostream.write(msg)
 
 async def main():
-    client = Client()
+    client = spoke.pubsub.client.Client()
     await client.run()
-    await asyncio.gather(*[client.subscribe(x, echo) for x in channels])
-    while True:
-        await asyncio.sleep(1)
+    await asyncio.gather(*[client.subscribe(x, echo) for x in args.channel])
+    await spoke.wait.wait()
+    if ostream:
+        ostream.close()
 
-try:
-    asyncio.run(main())
-except KeyboardInterrupt:
-    pass
+asyncio.run(main())

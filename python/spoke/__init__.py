@@ -3,3 +3,4 @@ from . import genid
 from . import message
 from . import pubsub
 from . import simple
+from . import wait

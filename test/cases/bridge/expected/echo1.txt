@@ -1,0 +1,7 @@
+[1] -control/subscribe: **
+[1] -control/bounce: False
+[1] -control/subscribe: **
+[1] -control/subscribe: square/-rpc/caller_id/0/result
+[1] square/-rpc/caller_id/0/call: 5
+[1] square/-rpc/caller_id/0/result: {'okay': 25}
+[1] -control/unsubscribe: square/-rpc/caller_id/0/result

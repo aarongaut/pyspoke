@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import asyncio
-from spoke.pubsub.server import Server
+import spoke
 
-server = Server()
+server = spoke.pubsub.server.Server()
 
 try:
     asyncio.run(server.run())
