@@ -6,6 +6,7 @@ from spoke.pubsub.error import RemoteCallError
 class TestFailure(AssertionError):
     pass
 
+
 async def main():
     client = Client()
     await client.run()

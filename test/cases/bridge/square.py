@@ -12,4 +12,5 @@ async def main():
     await client.provide("square", square)
     await spoke.wait.wait()
 
+
 asyncio.run(main())

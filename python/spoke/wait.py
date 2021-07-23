@@ -1,6 +1,7 @@
 import signal
 import asyncio
 
+
 async def wait():
     stop_event = asyncio.Event()
     loop = asyncio.get_running_loop()
