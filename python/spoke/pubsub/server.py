@@ -21,7 +21,7 @@ class MessageSingleServerPubSub(spoke.message.server.SingleServer):
                 channel = spoke.pubsub.route.canonical(channel)
                 route = self._table.add_rule(channel)
                 for pchannel, msg in self.__context["persist"].items():
-                    if route.test(pchannel):
+                    if route.test(spoke.pubsub.route.tokenize(pchannel)):
                         await self.send(msg.pack())
 
 

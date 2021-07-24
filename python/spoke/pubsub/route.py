@@ -22,6 +22,8 @@ def canonical(channel):
 
 class Route:
     def __init__(self, tokens, destination=None):
+        if isinstance(tokens, str):
+            raise ValueError("tokens should not be a string")
         self.tokens = tokens
         self.destination = destination
 
@@ -32,6 +34,8 @@ class Route:
         return hash(self.tokens)
 
     def test(self, tokens):
+        if isinstance(tokens, str):
+            raise ValueError("tokens should not be a string")
         stack = [(0, 0)]
         while stack:
             ci, ri = stack.pop()

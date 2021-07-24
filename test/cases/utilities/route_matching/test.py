@@ -47,6 +47,11 @@ cases = [
         "expected": False,
     },
     {
+        "rule": "*/*",
+        "channel": "foo/bar",
+        "expected": True,
+    },
+    {
         "rule": "foo/foo/foo",
         "channel": "foo/foo",
         "expected": False,
