@@ -40,7 +40,6 @@ class MessageSingleServerPubSub(spoke.message.server.SingleServer):
             del msg.head["bounce"]
         return hints
 
-
     async def handle_connect(self):
         self._context["clients"].append(self)
 

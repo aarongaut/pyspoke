@@ -3,8 +3,10 @@ import spoke
 
 client = spoke.pubsub.client.Client()
 
+
 async def echo(msg):
     print(msg.body)
+
 
 async def main():
     await client.run()
@@ -15,5 +17,6 @@ async def main():
     await client.publish("test", 4, bounce=True)
     await client.publish("test", 5, bounce=False)
     await asyncio.sleep(0.2)
+
 
 asyncio.run(main())
