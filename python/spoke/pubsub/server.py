@@ -8,7 +8,6 @@ class MessageSingleServerPubSub(spoke.message.server.SingleServer):
         self.__wrapper = wrapper
         self.__control_table = spoke.pubsub.route.RoutingTable()
         self.__context = context
-        self._bounce = True
         self._table = spoke.pubsub.route.RoutingTable()
 
         if "clients" not in context:
@@ -24,12 +23,23 @@ class MessageSingleServerPubSub(spoke.message.server.SingleServer):
                 channel = spoke.pubsub.route.canonical(channel)
                 self._table.remove_rule(channel)
 
-        def _bounce(flag):
-            self._bounce = bool(flag)
-
         self.__control_table.add_rule("-control/subscribe", _subscribe)
         self.__control_table.add_rule("-control/unsubscribe", _unsubscribe)
-        self.__control_table.add_rule("-control/bounce", _bounce)
+
+    @staticmethod
+    def massage_head(msg):
+        """Prepares a message to be published to clients. The message
+        is modified in place, and a dictionary of extracted server
+        hints is returned.
+
+        """
+        hints = {
+            "bounce": msg.head.get("bounce", True),
+        }
+        if "bounce" in msg.head:
+            del msg.head["bounce"]
+        return hints
+
 
     async def handle_connect(self):
         self._context["clients"].append(self)
@@ -46,9 +56,10 @@ class MessageSingleServerPubSub(spoke.message.server.SingleServer):
         else:
             for destination in self.__control_table.get_destinations(msg.channel):
                 destination(msg.body)
+            hints = self.massage_head(msg)
             to_json_msg = msg.pack()
             for client in self._context["clients"]:
-                if client == self and not self._bounce:
+                if client == self and not hints["bounce"]:
                     continue
                 if client._table.get_destinations(msg.channel):
                     await client.send(to_json_msg)
