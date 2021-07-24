@@ -1,3 +1,2 @@
--control/subscribe: **
 begin: None
 end: None

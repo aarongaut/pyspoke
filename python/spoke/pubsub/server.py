@@ -1,3 +1,4 @@
+import time
 import spoke
 import asyncio
 
@@ -12,13 +13,19 @@ class MessageSingleServerPubSub(spoke.message.server.SingleServer):
 
         if "clients" not in context:
             self.__context["clients"] = []
+        if "persist" not in context:
+            self.__context["persist"] = {}
 
-        def _subscribe(channel):
+        async def _subscribe(channel):
             if isinstance(channel, str):
                 channel = spoke.pubsub.route.canonical(channel)
-                self._table.add_rule(channel)
+                route = self._table.add_rule(channel)
+                for pchannel, msg in self.__context["persist"].items():
+                    if route.test(pchannel):
+                        await self.send(msg.pack())
 
-        def _unsubscribe(channel):
+
+        async def _unsubscribe(channel):
             if isinstance(channel, str):
                 channel = spoke.pubsub.route.canonical(channel)
                 self._table.remove_rule(channel)
@@ -33,8 +40,12 @@ class MessageSingleServerPubSub(spoke.message.server.SingleServer):
         hints is returned.
 
         """
+        if "time" not in msg.head:
+            msg.head["time"] = time.time()
         hints = {
             "bounce": msg.head.get("bounce", True),
+            "persist": msg.head.get("persist", False),
+            "time": msg.head["time"],
         }
         if "bounce" in msg.head:
             del msg.head["bounce"]
@@ -54,8 +65,17 @@ class MessageSingleServerPubSub(spoke.message.server.SingleServer):
             print(err_msg.format(e))
         else:
             for destination in self.__control_table.get_destinations(msg.channel):
-                destination(msg.body)
+                await destination(msg.body)
             hints = self.massage_head(msg)
+
+            if hints["persist"]:
+                last_msg = self.__context["persist"].get(msg.channel, None)
+                if last_msg is None or last_msg.head["time"] < hints["time"]:
+                    self.__context["persist"][msg.channel] = msg
+                elif last_msg.head["time"] > hints["time"]:
+                    # Discarding old message
+                    return
+
             to_json_msg = msg.pack()
             for client in self._context["clients"]:
                 if client == self and not hints["bounce"]:

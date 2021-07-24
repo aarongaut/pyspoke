@@ -30,9 +30,9 @@ class Client:
         json_msg = spoke.pubsub.msgpack.Message(channel, body, **head).pack()
         await self.__level2_client.send(json_msg)
 
-    async def subscribe(self, channel, callback):
+    async def subscribe(self, channel, callback, **head):
         rule = self._table.add_rule(channel, callback)
-        await self.publish("-control/subscribe", rule.channel())
+        await self.publish("-control/subscribe", rule.channel(), **head)
 
     async def unsubscribe(self, channel):
         rule = self._table.remove_rule(channel)

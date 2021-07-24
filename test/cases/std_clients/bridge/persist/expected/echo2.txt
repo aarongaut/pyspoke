@@ -1,0 +1,4 @@
+[2] foo: 5
+[2] bar: 10
+[2] -control/subscribe: **
+[2] foo: 10

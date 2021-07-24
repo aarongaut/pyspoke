@@ -7,6 +7,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("channel")
 parser.add_argument("body", nargs="?", default=None)
+parser.add_argument("--persist", "-p", action="store_true")
 args = parser.parse_args()
 
 if args.body is None:
@@ -14,4 +15,4 @@ if args.body is None:
 else:
     body = json.loads(args.body)
 
-spoke.simple.publish(args.channel, body)
+spoke.simple.publish(args.channel, body, persist=args.persist)

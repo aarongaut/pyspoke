@@ -1,4 +1,3 @@
--control/subscribe: **
 -control/subscribe: test
 test: 1
 test: 2

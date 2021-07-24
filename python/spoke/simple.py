@@ -25,11 +25,11 @@ def call(channel, msg, host=None, port=None, timeout=None):
     return result[0]
 
 
-def publish(channel, msg, host=None, port=None):
+def publish(channel, msg, host=None, port=None, **head):
     client = spoke.pubsub.client.Client(host=host, port=port)
 
     async def run():
         await client.run()
-        await client.publish(channel, msg)
+        await client.publish(channel, msg, **head)
 
     asyncio.run(run())

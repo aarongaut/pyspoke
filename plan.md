@@ -1,8 +1,5 @@
 # TODOs
 
-* Consider adding a header (room for adding new metadata fields, where channel is just one item)
-    * Header is a top level dictionary that must always exist and contain the channel
-    * Other fields are optional and may help with routing, time, sequencing, etc...
 * Make everything more robust
     * Add spotty-spoke command for help with testing (repeatedly starts and stops a pubsub spoke server)
     * Be more disciplined about when to await, create task or just make synchronous calls
