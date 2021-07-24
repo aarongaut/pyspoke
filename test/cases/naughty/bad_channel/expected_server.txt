@@ -1,4 +1,6 @@
-Ignoring malformed message from client: channel is not a string
-Ignoring malformed message from client: channel is not a string
-Ignoring malformed message from client: channel is not a string
-Ignoring malformed message from client: channel is not a string
+Ignoring malformed message from client: head is not preset or is not a dict
+Ignoring malformed message from client: json_msg is not a dict
+Ignoring malformed message from client: json_msg is not a dict
+Ignoring malformed message from client: head is not preset or is not a dict
+Ignoring malformed message from client: channel is not preset or is not a string
+Ignoring malformed message from client: channel is not preset or is not a string

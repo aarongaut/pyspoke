@@ -28,8 +28,11 @@ printf "Starting bridge\n"
 PYTHONUNBUFFERED=1 spoke-bridge --port1 $port1 --port2 $port2 &
 BRIDGE_PID=$!
 
+printf "Giving bridge time to start up\n"
+sleep 0.2
+
 printf "Starting square provider on server2\n"
-PYTHONUNBUFFERED=1 SPOKEPORT=$port2 python square.py &
+PYTHONUNBUFFERED=1 SPOKEPORT=$port2 python ../../common/square.py &
 SQUARE_PID=$!
 
 printf "Waiting for everything to start up\n"

@@ -14,10 +14,10 @@ class MessageClientPubSub(spoke.message.client.Client):
         if not self.__bounce:
             self.__wrapper.publich("-control/bounce", False)
 
-    async def handle_recv(self, msg):
-        channel, payload = spoke.pubsub.msgpack.unpack_msg(msg)
-        for destination in self.__wrapper._table.get_destinations(channel):
-            await destination(channel, payload)
+    async def handle_recv(self, json_msg):
+        msg = spoke.pubsub.msgpack.Message.unpack(json_msg)
+        for destination in self.__wrapper._table.get_destinations(msg.channel):
+            await destination(msg)
 
 
 class Client:
@@ -29,9 +29,9 @@ class Client:
     async def run(self):
         await self.__level2_client.run()
 
-    async def publish(self, channel, payload):
-        full_msg = spoke.pubsub.msgpack.pack_msg(channel, payload)
-        await self.__level2_client.send(full_msg)
+    async def publish(self, channel, body, **head):
+        json_msg = spoke.pubsub.msgpack.Message(channel, body, **head).pack()
+        await self.__level2_client.send(json_msg)
 
     async def subscribe(self, channel, callback):
         rule = self._table.add_rule(channel, callback)
@@ -53,30 +53,30 @@ class Client:
     async def provide(self, channel, callback):
         channel = spoke.pubsub.route.canonical(channel)
 
-        async def _provide(call_channel, call_payload):
-            res_channel = call_channel.rstrip("call") + "result"
-            res_payload = {}
+        async def _provide(call_msg):
+            res_channel = call_msg.channel.rstrip("call") + "result"
+            res_body = {}
             try:
-                res_payload["okay"] = await callback(call_channel, call_payload)
+                res_body["okay"] = await callback(call_msg)
             except Exception as e:
-                res_payload["error"] = str(e)
-            await self.publish(res_channel, res_payload)
+                res_body["error"] = str(e)
+            await self.publish(res_channel, res_body)
 
         await self.subscribe(channel + "/-rpc/**/call", _provide)
 
-    async def call(self, channel, payload, timeout=None):
+    async def call(self, channel, body, timeout=None):
         future = asyncio.Future()
         channel = spoke.pubsub.route.canonical(channel)
         channel_head = "/".join([channel, "-rpc", self.id, spoke.genid.luid()])
         pub_channel = "/".join([channel_head, "call"])
         sub_channel = "/".join([channel_head, "result"])
 
-        async def _handle_response(_, res_msg):
+        async def _handle_response(res_msg):
             if not future.done():
-                if "okay" in res_msg:
-                    future.set_result(res_msg["okay"])
-                elif "error" in res_msg:
-                    err = spoke.pubsub.error.RemoteCallError(res_msg["error"])
+                if "okay" in res_msg.body:
+                    future.set_result(res_msg.body["okay"])
+                elif "error" in res_msg.body:
+                    err = spoke.pubsub.error.RemoteCallError(res_msg.body["error"])
                     future.set_exception(err)
                 else:
                     err = spoke.pubsub.error.RemoteCallError("Malformed response")
@@ -94,5 +94,5 @@ class Client:
             asyncio.create_task(_handle_timeout())
 
         await self.subscribe(sub_channel, _handle_response)
-        await self.publish(pub_channel, payload)
+        await self.publish(pub_channel, body)
         return future

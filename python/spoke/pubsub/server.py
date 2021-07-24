@@ -37,20 +37,21 @@ class MessageSingleServerPubSub(spoke.message.server.SingleServer):
     async def handle_disconnect(self):
         self._context["clients"].remove(self)
 
-    async def handle_recv(self, msg):
+    async def handle_recv(self, json_msg):
         try:
-            channel, payload = spoke.pubsub.msgpack.unpack_msg(msg)
+            msg = spoke.pubsub.msgpack.Message.unpack(json_msg)
         except ValueError as e:
-            msg = "Ignoring malformed message from client: {}"
-            print(msg.format(e))
+            err_msg = "Ignoring malformed message from client: {}"
+            print(err_msg.format(e))
         else:
-            for destination in self.__control_table.get_destinations(channel):
-                destination(payload)
+            for destination in self.__control_table.get_destinations(msg.channel):
+                destination(msg.body)
+            to_json_msg = msg.pack()
             for client in self._context["clients"]:
                 if client == self and not self._bounce:
                     continue
-                if client._table.get_destinations(channel):
-                    await client.send(msg)
+                if client._table.get_destinations(msg.channel):
+                    await client.send(to_json_msg)
 
 
 class SingleServer:

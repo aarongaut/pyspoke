@@ -16,10 +16,10 @@ if args.port1 == args.port2 and args.host1 == args.host2:
     sys.exit(1)
 
 def mirror(other):
-    async def _inner(channel, payload):
-        if channel.startswith("-control/"):
+    async def _inner(msg):
+        if msg.channel.startswith("-control/"):
             return
-        await other.publish(channel, payload)
+        await other.publish(body=msg.body, **msg.head)
     return _inner
 
 async def main():

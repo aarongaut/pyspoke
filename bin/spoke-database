@@ -8,11 +8,11 @@ class Database:
     def __init__(self):
         self.__database = {}
 
-    async def put(self, channel, data):
-        self.__database.update(data)
+    async def put(self, msg):
+        self.__database.update(msg.body)
 
-    async def get(self, channel, key):
-        return self.__database.get(key, None)
+    async def get(self, msg):
+        return self.__database.get(msg.body, None)
 
 
 async def main():

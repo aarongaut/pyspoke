@@ -1,6 +1,6 @@
 [2] -control/subscribe: **
-[2] -control/subscribe: square/-rpc/**/call
 [2] -control/bounce: False
 [2] -control/subscribe: **
+[2] -control/subscribe: square/-rpc/**/call
 [2] square/-rpc/caller_id/0/call: 5
 [2] square/-rpc/caller_id/0/result: {'okay': 25}

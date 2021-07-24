@@ -1,17 +1,16 @@
 import asyncio
-from spoke.pubsub.client import Client
+import spoke
 
 
-async def invert(channel, msg):
-    return 1 / msg
+async def invert(msg):
+    return 1 / msg.body
 
 
 async def main():
-    client = Client()
+    client = spoke.pubsub.client.Client()
     await client.run()
     await client.provide("invert", invert)
-    while True:
-        await asyncio.sleep(1)
+    await spoke.wait.wait()
 
 
 try:

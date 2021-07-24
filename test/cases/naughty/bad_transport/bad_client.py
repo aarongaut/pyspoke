@@ -11,7 +11,7 @@ def send(data):
     sock.send(data)
 
 
-send(b'{"channel": "begin"}\x00')
+send(b'{"head": {"channel": "begin"}}\x00')
 for __ in range(1000):
     send(b"junk")
-send(b'{"channel": "end"}\x00')
+send(b'{"head": {"channel": "end"}}\x00')

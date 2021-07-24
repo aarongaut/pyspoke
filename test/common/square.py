@@ -2,8 +2,8 @@ import asyncio
 import spoke
 
 
-async def square(channel, msg):
-    return msg * msg
+async def square(msg):
+    return msg.body * msg.body
 
 
 async def main():

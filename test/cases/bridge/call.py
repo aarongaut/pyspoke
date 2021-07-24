@@ -2,7 +2,7 @@ import asyncio
 import spoke
 
 client = spoke.pubsub.client.Client()
-# Using a deterministic id for output comparison
+# Using a deterministic id to produce consistent output for comparison
 client.id = "caller_id"
 
 

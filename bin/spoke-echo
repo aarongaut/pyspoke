@@ -17,14 +17,14 @@ if args.output_path:
 else:
     ostream = None
 
-async def echo(channel, msg):
+async def echo(msg):
     if args.label:
-        msg = "[{}] {}: {}\n".format(args.label, channel, msg)
+        output = "[{}] {}: {}\n".format(args.label, msg.channel, msg.body)
     else:
-        msg = "{}: {}\n".format(channel, msg)
-    print(msg, end="")
+        output = "{}: {}\n".format(msg.channel, msg.body)
+    print(output, end="")
     if ostream:
-        ostream.write(msg)
+        ostream.write(output)
 
 async def main():
     client = spoke.pubsub.client.Client()

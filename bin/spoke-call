@@ -7,17 +7,17 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("channel")
-parser.add_argument("payload", nargs="?", default=None)
+parser.add_argument("body", nargs="?", default=None)
 parser.add_argument("-t", "--timeout", type=float, default=None)
 args = parser.parse_args()
 
-if args.payload is None:
-    payload = args.payload
+if args.body is None:
+    body = args.body
 else:
-    payload = json.loads(args.payload)
+    body = json.loads(args.body)
 
 try:
-    print(spoke.simple.call(args.channel, payload, timeout=args.timeout))
+    print(spoke.simple.call(args.channel, body, timeout=args.timeout))
 except TimeoutError:
     print("Timeout")
     sys.exit(1)

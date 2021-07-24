@@ -15,7 +15,7 @@ ECHO_PID=$!
 sleep 0.2
 
 printf "Starting square provider\n"
-SPOKEPORT=$port python square.py &
+SPOKEPORT=$port python ../../../common/square.py &
 SQUARE_PID=$!
 sleep 0.2
 
