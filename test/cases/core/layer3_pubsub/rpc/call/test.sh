@@ -2,7 +2,7 @@ set -e
 rm -rf artifacts
 mkdir -p artifacts
 
-port=$(../../../common/find-free-port)
+port=$(../../../../../common/find-free-port)
 
 printf "Starting server on port $port\n"
 SPOKEPORT=$port spoke &
@@ -10,7 +10,7 @@ SERVER_PID=$!
 sleep 0.2
 
 printf "Starting square provider\n"
-SPOKEPORT=$port python ../../../common/square.py &
+SPOKEPORT=$port python ../../../../../common/square.py &
 SQUARE_PID=$!
 sleep 0.2
 

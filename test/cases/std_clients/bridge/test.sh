@@ -2,8 +2,8 @@ set -e
 rm -rf artifacts
 mkdir -p artifacts
 
-port1=$(../../common/find-free-port)
-port2=$(../../common/find-free-port)
+port1=$(../../../common/find-free-port)
+port2=$(../../../common/find-free-port)
 
 printf "Starting server1 on port $port1\n"
 PYTHONUNBUFFERED=1 SPOKEPORT=$port1 spoke &
@@ -32,7 +32,7 @@ printf "Giving bridge time to start up\n"
 sleep 0.2
 
 printf "Starting square provider on server2\n"
-PYTHONUNBUFFERED=1 SPOKEPORT=$port2 python ../../common/square.py &
+PYTHONUNBUFFERED=1 SPOKEPORT=$port2 python ../../../common/square.py &
 SQUARE_PID=$!
 
 printf "Waiting for everything to start up\n"

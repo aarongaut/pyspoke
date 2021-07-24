@@ -2,7 +2,7 @@ set -e
 rm -rf artifacts
 mkdir -p artifacts
 
-port=$(../../common/find-free-port)
+port=$(../../../../common/find-free-port)
 
 printf "Starting server on port $port\n"
 SPOKEPORT=$port spoke &

@@ -2,7 +2,7 @@ set -e
 rm -rf artifacts
 mkdir -p artifacts
 
-port=$(../../../common/find-free-port)
+port=$(../../../../common/find-free-port)
 
 printf "Starting server on port $port\n"
 SPOKEPORT=$port spoke &
@@ -14,23 +14,15 @@ PYTHONUNBUFFERED=1 SPOKEPORT=$port spoke-echo > artifacts/output.txt &
 ECHO_PID=$!
 sleep 0.2
 
-printf "Starting square provider\n"
-SPOKEPORT=$port python ../../../common/square.py &
-SQUARE_PID=$!
-sleep 0.2
-
 printf "Publishing message\n"
-SPOKEPORT=$port spoke-publish square/-rpc/call 5 &
+SPOKEPORT=$port spoke-publish foo 5 &
 sleep 0.2
 
 printf "Sending SIGTERM to server\n"
 kill -15 $SERVER_PID
 
-printf "Sending SIGTERM to echo\n"
+printf "Sending SIGTERM to echo client\n"
 kill -15 $ECHO_PID
-
-printf "Sending SIGTERM to square\n"
-kill -15 $SQUARE_PID
 
 printf "Waiting for everything to shutdown\n"
 wait
