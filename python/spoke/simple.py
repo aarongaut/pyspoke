@@ -16,20 +16,26 @@ def call(channel, msg, host=None, port=None, timeout=None):
     result = [None]
 
     async def run():
-        await client.run()
+        await client.run(timeout=timeout)
         future = await client.call(channel, msg, timeout=timeout)
         await future
         result[0] = future.result()
 
-    asyncio.run(run())
+    try:
+        asyncio.run(run())
+    except asyncio.TimeoutError as e:
+        raise TimeoutError from e
     return result[0]
 
 
-def publish(channel, msg, host=None, port=None, **head):
+def publish(channel, msg, host=None, port=None, timeout=None, **head):
     client = spoke.pubsub.client.Client(host=host, port=port)
 
     async def run():
-        await client.run()
-        await client.publish(channel, msg, **head)
+        await client.run(timeout=timeout)
+        await client.publish(channel, msg, timeout=timeout, **head)
 
-    asyncio.run(run())
+    try:
+        asyncio.run(run())
+    except asyncio.TimeoutError as e:
+        raise TimeoutError from e

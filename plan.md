@@ -3,10 +3,8 @@
 * Make everything more robust
     * Add spotty-spoke command for help with testing (repeatedly starts and stops a pubsub spoke server)
     * Be more disciplined about when to await, create task or just make synchronous calls
-* Think about how to support the equivalent of latched topics
-    * How can it be made to work with spoke-bridge?
-    * What happens if a bridge connects two spoke servers with different latched values stored?
-        * Prefer newer values
+    * More graceful failure for clients when the server is unreachable - shouldn't permanently lock up the whole process
+        * Timeout for all calls that might need to wait on a connection
 
 # Old notes
 

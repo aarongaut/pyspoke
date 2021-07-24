@@ -37,12 +37,12 @@ class Client:
     def __init__(self, host=None, port=None):
         self.__level1_client = ConnectionClientJSON(self, host, port)
 
-    async def run(self):
-        await self.__level1_client.run()
+    async def run(self, timeout=None):
+        await self.__level1_client.run(timeout=timeout)
 
-    async def send(self, msg):
+    async def send(self, msg, timeout=None):
         data = spoke.message.serialize.msg_to_bytes(msg)
-        await self.__level1_client.send(data)
+        await self.__level1_client.send(data, timeout=timeout)
 
     async def handle_connect(self):
         pass

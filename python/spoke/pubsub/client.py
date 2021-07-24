@@ -23,22 +23,24 @@ class Client:
         self.__level2_client = MessageClientPubSub(self, host, port)
         self.id = spoke.genid.uuid()
 
-    async def run(self):
-        await self.__level2_client.run()
+    async def run(self, timeout=None):
+        await self.__level2_client.run(timeout=timeout)
 
-    async def publish(self, channel, body, **head):
+    async def publish(self, channel, body, timeout=None, **head):
         json_msg = spoke.pubsub.msgpack.Message(channel, body, **head).pack()
-        await self.__level2_client.send(json_msg)
+        await self.__level2_client.send(json_msg, timeout=timeout)
 
-    async def subscribe(self, channel, callback, **head):
+    async def subscribe(self, channel, callback, timeout=None, **head):
+        channel = spoke.pubsub.route.canonical(channel)
+        await self.publish("-control/subscribe", channel, timeout=timeout, **head)
         rule = self._table.add_rule(channel, callback)
-        await self.publish("-control/subscribe", rule.channel(), **head)
 
-    async def unsubscribe(self, channel):
+    async def unsubscribe(self, channel, timeout=None):
+        channel = spoke.pubsub.route.canonical(channel)
+        await self.publish("-control/unsubscribe", channel, timeout=timeout)
         rule = self._table.remove_rule(channel)
-        await self.publish("-control/unsubscribe", rule.channel())
 
-    async def provide(self, channel, callback):
+    async def provide(self, channel, callback, timeout=None):
         channel = spoke.pubsub.route.canonical(channel)
 
         async def _provide(call_msg):
@@ -50,7 +52,7 @@ class Client:
                 res_body["error"] = str(e)
             await self.publish(res_channel, res_body)
 
-        await self.subscribe(channel + "/-rpc/**/call", _provide)
+        await self.subscribe(channel + "/-rpc/**/call", _provide, timeout=timeout)
 
     async def call(self, channel, body, timeout=None):
         future = asyncio.Future()

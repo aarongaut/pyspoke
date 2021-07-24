@@ -8,6 +8,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("channel")
 parser.add_argument("body", nargs="?", default=None)
 parser.add_argument("--persist", "-p", action="store_true")
+parser.add_argument("--timeout", "-t", type=float)
 args = parser.parse_args()
 
 if args.body is None:
@@ -15,4 +16,4 @@ if args.body is None:
 else:
     body = json.loads(args.body)
 
-spoke.simple.publish(args.channel, body, persist=args.persist)
+spoke.simple.publish(args.channel, body, timeout=args.timeout, persist=args.persist)

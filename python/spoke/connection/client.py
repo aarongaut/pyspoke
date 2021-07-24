@@ -15,9 +15,12 @@ class Client:
         self.__connection = None
         self.__lock = None
 
-    async def run(self):
+    async def run(self, timeout=None):
         self.__lock = asyncio.Lock()
-        await self.__get_connection()
+        if timeout:
+            await asyncio.wait_for(self.__get_connection(), timeout=timeout)
+        else:
+            await self.__get_connection()
         self.__task = asyncio.create_task(self.__run_inner())
 
     async def handle_connect(self):
@@ -77,7 +80,13 @@ class Client:
                 print("UNEXPECTED CLIENT ERROR 2", type(e), e)
                 raise
 
-    async def send(self, data):
+    async def send(self, data, timeout=None):
+        if timeout:
+            await asyncio.wait_for(self.__send_inner(data), timeout)
+        else:
+            await self.__send_inner(data)
+
+    async def __send_inner(self, data):
         while True:
             _, writer = await self.__get_connection()
             try:
