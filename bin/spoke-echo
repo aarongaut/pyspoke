@@ -5,6 +5,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--output-path", "-o", help="File to write to in addition to printing")
 parser.add_argument("--first", "-f", action="store_true", help="Exit after echoing the first received message")
 parser.add_argument("--label", "-l", help="Label to include at beginning of each output")
+parser.add_argument("--verbose", "-v", help="Print the full message head and body")
 parser.add_argument("channel", nargs="*", default=["**"])
 args = parser.parse_args()
 
@@ -20,10 +21,14 @@ else:
     ostream = None
 
 async def echo(msg):
-    if args.label:
-        output = "[{}] {}: {}\n".format(args.label, msg.channel, msg.body)
+    if args.verbose:
+        msg_text = str(msg.pack())
     else:
-        output = "{}: {}\n".format(msg.channel, msg.body)
+        msg_text = "{}: {}".format(msg.channel, msg.body)
+    if args.label:
+        output = "[{}] {}\n".format(args.label, msg_text)
+    else:
+        output = msg_text + "\n"
     print(output, end="")
     if ostream:
         ostream.write(output)
