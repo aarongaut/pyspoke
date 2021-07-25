@@ -1,9 +1,9 @@
-all: test dist
+all: dist
 .PHONY: all
 
-release: dist
+publish: dist
 	python3 -m twine upload dist/*
-.PHONY: release
+.PHONY: publish
 
 clean:
 	rm -rf dist
@@ -18,5 +18,6 @@ test:
 .PHONY: test
 
 dist: $(shell find src) LICENSE pyproject.toml README.md setup.cfg
+	dev-bin/rl runtests tests
 	python3 -m build
 
