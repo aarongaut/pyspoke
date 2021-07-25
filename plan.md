@@ -3,8 +3,10 @@
 * Make everything more robust
     * Add spotty-spoke command for help with testing (repeatedly starts and stops a pubsub spoke server)
     * Be more disciplined about when to await, create task or just make synchronous calls
-    * More graceful failure for clients when the server is unreachable - shouldn't permanently lock up the whole process
-        * Timeout for all calls that might need to wait on a connection
+* Packaging
+    * Add documentation
+    * Test with older pythons and relax version requirements
+    * Add type annotations and test that runs mypy
 
 # Old notes
 
