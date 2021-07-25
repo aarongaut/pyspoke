@@ -1,17 +1,11 @@
-FILES :=
-
-all: $(FILES)
+all:
 .PHONY: all
-
-clean:
-	rm -f $(FILES)
-.PHONY: clean
 
 format:
 	black .
 .PHONY: format
 
 test:
-	rl runtests
+	bin/rl runtests tests
 .PHONY: test
 

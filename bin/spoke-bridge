@@ -1,35 +1,4 @@
 #!/usr/bin/env python
-import argparse
-import asyncio
-import sys
-import spoke
+from spoke.cli import bridge
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--port1", type=int, default=7181)
-parser.add_argument("--host1", default="127.0.0.1")
-parser.add_argument("--port2", type=int, default=7181)
-parser.add_argument("--host2", default="127.0.0.1")
-args = parser.parse_args()
-
-if args.port1 == args.port2 and args.host1 == args.host2:
-    print("The given arguments will bridge the server to itself. Aborting.")
-    sys.exit(1)
-
-def mirror(other):
-    async def _inner(msg):
-        if msg.channel.startswith("-control/"):
-            return
-        msg.head["bounce"] = False
-        await other.publish(body=msg.body, **msg.head)
-    return _inner
-
-async def main():
-    client1 = spoke.pubsub.client.Client(port=args.port1, host=args.host1)
-    await client1.run()
-    client2 = spoke.pubsub.client.Client(port=args.port2, host=args.host2)
-    await client2.run()
-    await client1.subscribe("**", mirror(client2))
-    await client2.subscribe("**", mirror(client1))
-    await spoke.wait.wait()
-
-asyncio.run(main())
+bridge()

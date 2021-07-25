@@ -1,46 +1,4 @@
 #!/usr/bin/env python
-import argparse
+from spoke.cli import echo
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--output-path", "-o", help="File to write to in addition to printing")
-parser.add_argument("--first", "-f", action="store_true", help="Exit after echoing the first received message")
-parser.add_argument("--label", "-l", help="Label to include at beginning of each output")
-parser.add_argument("--verbose", "-v", help="Print the full message head and body")
-parser.add_argument("channel", nargs="*", default=["**"])
-args = parser.parse_args()
-
-import sys
-import asyncio
-import atexit
-import spoke
-import signal
-
-if args.output_path:
-    ostream = open(args.output_path, "w")
-else:
-    ostream = None
-
-async def echo(msg):
-    if args.verbose:
-        msg_text = str(msg.pack())
-    else:
-        msg_text = "{}: {}".format(msg.channel, msg.body)
-    if args.label:
-        output = "[{}] {}\n".format(args.label, msg_text)
-    else:
-        output = msg_text + "\n"
-    print(output, end="")
-    if ostream:
-        ostream.write(output)
-    if args.first:
-        signal.raise_signal(signal.SIGTERM)
-
-async def main():
-    client = spoke.pubsub.client.Client()
-    await client.run()
-    await asyncio.gather(*[client.subscribe(x, echo, bounce=False) for x in args.channel])
-    await spoke.wait.wait()
-    if ostream:
-        ostream.close()
-
-asyncio.run(main())
+echo()

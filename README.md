@@ -1,6 +1,6 @@
 # `spoke`
 
-A python library supporting pubsub and remote procedure calls using JSON messages.
+A python library supporting pubsub and remote procedure calls.
 
 # Isn't this just a bad dbus?
 

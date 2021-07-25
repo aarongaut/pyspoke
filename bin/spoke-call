@@ -1,27 +1,4 @@
 #!/usr/bin/env python
-import json
-import spoke
-import sys
+from spoke.cli import call
 
-import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument("channel")
-parser.add_argument("body", nargs="?", default=None)
-parser.add_argument("-t", "--timeout", type=float, default=None)
-args = parser.parse_args()
-
-if args.body is None:
-    body = args.body
-else:
-    body = json.loads(args.body)
-
-try:
-    print(spoke.simple.call(args.channel, body, timeout=args.timeout))
-except TimeoutError:
-    print("Timeout")
-    sys.exit(1)
-except spoke.pubsub.error.RemoteCallError as e:
-    msg = "Error: {}"
-    print(msg.format(e))
-    sys.exit(1)
+call()

@@ -1,0 +1,86 @@
+#!/usr/bin/env python3
+"""A dead simple test runner script. Searches recursively in the given
+directory for test.sh files and run them. If no directory is given,
+searches the current directory. A summary is printed at the end.
+
+"""
+import argparse
+import sys
+import pathlib
+
+
+def add_arguments(parser):
+    default = 5
+    parser.add_argument(
+        "-t",
+        "--timeout",
+        type=float,
+        default=default,
+        help=f"fails tests that run longer than this many seconds [{default}]",
+    )
+    parser.add_argument("tests_dir", type=pathlib.Path, nargs="?", default=".")
+
+
+def print_info(text):
+    print("\x1b[1;96m" + text + "\x1b[0m")
+    sys.stdout.flush()
+
+
+def print_good(text):
+    print("\x1b[1;92m" + text + "\x1b[0m")
+    sys.stdout.flush()
+
+
+def print_bad(text):
+    print("\x1b[1;91m" + text + "\x1b[0m")
+    sys.stdout.flush()
+
+
+def main(tests_dir, timeout):
+    import subprocess
+    import os
+
+    test_paths = tests_dir.rglob("test.sh")
+    timeouts = []
+    failures = []
+    env = os.environ
+    env["RUNTESTS"] = "1"
+    for test_path in test_paths:
+        test_dir = test_path.parent
+        print_info("\nRunning test: {}".format(test_dir))
+        try:
+            completed_process = subprocess.run(
+                ["sh", "test.sh"], cwd=test_dir, timeout=timeout, env=env
+            )
+        except subprocess.TimeoutExpired:
+            print_bad("Timeout")
+            timeouts.append(test_dir)
+            continue
+        returncode = completed_process.returncode
+        if returncode:
+            failures.append(test_dir)
+            print_bad("Failure [{}]".format(returncode))
+        else:
+            print_good("Success")
+    print_info("\nSummary")
+    if not timeouts and not failures:
+        print_good("All tests passed. Great job!")
+        return 0
+    if failures:
+        buff = ["{} failures".format(len(failures))]
+        for failure in failures:
+            buff.append("\t{}".format(failure))
+        print_bad("\n".join(buff))
+    if timeouts:
+        buff = ["{} timeouts".format(len(timeouts))]
+        for timeout in timeouts:
+            buff.append("\t{}".format(timeout))
+        print_bad("\n".join(buff))
+    return 1
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    add_arguments(parser)
+    args = parser.parse_args()
+    sys.exit(main(**args.__dict__))
