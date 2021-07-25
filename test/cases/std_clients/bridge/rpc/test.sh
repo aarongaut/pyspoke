@@ -6,11 +6,11 @@ port1=$(../../../../common/find-free-port)
 port2=$(../../../../common/find-free-port)
 
 printf "Starting server1 on port $port1\n"
-PYTHONUNBUFFERED=1 SPOKEPORT=$port1 spoke &
+PYTHONUNBUFFERED=1 SPOKEPORT=$port1 spoke-server &
 SERVER1_PID=$!
 
 printf "Starting server2 on port $port2\n"
-PYTHONUNBUFFERED=1 SPOKEPORT=$port2 spoke &
+PYTHONUNBUFFERED=1 SPOKEPORT=$port2 spoke-server &
 SERVER2_PID=$!
 
 printf "Starting echo client1\n"

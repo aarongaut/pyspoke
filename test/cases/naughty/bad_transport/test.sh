@@ -5,7 +5,7 @@ mkdir -p artifacts
 port=$(../../../common/find-free-port)
 
 printf "Starting server on port $port\n"
-PYTHONUNBUFFERED=1 SPOKEPORT=$port spoke >& artifacts/output_server.txt &
+PYTHONUNBUFFERED=1 SPOKEPORT=$port spoke-server >& artifacts/output_server.txt &
 SERVER_PID=$!
 sleep 0.2
 
