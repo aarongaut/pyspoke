@@ -24,7 +24,6 @@ class MessageSingleServerPubSub(spoke.message.server.SingleServer):
                     if route.test(spoke.pubsub.route.tokenize(pchannel)):
                         await self.send(msg.pack())
 
-
         async def _unsubscribe(channel):
             if isinstance(channel, str):
                 channel = spoke.pubsub.route.canonical(channel)
