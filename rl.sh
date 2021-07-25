@@ -1,2 +1,2 @@
-export PYTHONPATH=$RL_ROOT/python:$PYTHONPATH
-export PATH=$RL_ROOT/bin:$PATH
+export PYTHONPATH=$RL_ROOT/src:$PYTHONPATH
+export PATH=$RL_ROOT/dev-bin:$PATH
