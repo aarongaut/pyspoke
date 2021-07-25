@@ -6,6 +6,6 @@ A python library supporting pubsub and remote procedure calls.
 
 Actually this project started out as a bad ROS, but yes.
 
-# Installation
+# Usage
 
-Why?
+See the various test cases in `tests` for examples
