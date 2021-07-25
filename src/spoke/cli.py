@@ -8,6 +8,7 @@ def server():
         asyncio.run(server.run())
     except KeyboardInterrupt:
         pass
+    return 0
 
 
 def echo():
@@ -67,6 +68,7 @@ def echo():
             ostream.close()
 
     asyncio.run(main())
+    return 0
 
 
 def call():
@@ -96,6 +98,7 @@ def call():
         msg = "Error: {}"
         print(msg.format(e))
         sys.exit(1)
+    return 0
 
 
 def publish():
@@ -117,6 +120,7 @@ def publish():
         body = json.loads(args.body)
 
     spoke.simple.publish(args.channel, body, timeout=args.timeout, persist=args.persist)
+    return 0
 
 
 def bridge():
@@ -156,3 +160,4 @@ def bridge():
         await spoke.wait.wait()
 
     asyncio.run(main())
+    return 0
