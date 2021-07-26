@@ -4,7 +4,7 @@ all: dist
 .PHONY: all
 
 install: dist
-	python3 -m pip install --force-reinstall dist/pyspoke-$(VERSION).tar.gz
+	python3 -m pip install --force-reinstall dist/pyspoke-$(VERSION)-py3-none-any.whl
 .PHONY: install
 
 publish: test dist

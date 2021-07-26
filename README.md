@@ -1,11 +1,47 @@
 # `spoke`
 
-A python library supporting pubsub and remote procedure calls.
+A python library supporting pubsub and remote procedure calls on Linux.
 
-# Isn't this just a bad dbus?
+# Overview
 
-Actually this project started out as a bad ROS, but yes.
+TBD
 
-# Usage
+# Installation
 
-See the various test cases in `tests` for examples
+## Using pip
+
+Install from pip:
+
+```
+pip install pyspoke
+```
+
+## From latest source
+
+Building the distribution:
+
+```
+git clone https://gitlab.com/samflam/pyspoke.git
+cd pyspoke
+make
+```
+
+Installing:
+
+```
+make install
+```
+
+or
+
+```
+pip install dist/*.whl
+```
+
+# Testing
+
+From the top level, do:
+
+```
+make test
+```
