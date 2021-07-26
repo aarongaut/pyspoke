@@ -8,9 +8,9 @@ TBD
 
 # Installation
 
-## Using pip
+## From [PyPI](https://pypi.org/project/pyspoke/)
 
-Install from pip:
+Install using pip:
 
 ```
 python3 -m pip install pyspoke
