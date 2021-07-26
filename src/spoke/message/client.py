@@ -4,7 +4,7 @@ import asyncio
 import spoke
 
 
-class ConnectionClientJSON(spoke.connection.client.Client):
+class _ConnectionClientJSON(spoke.connection.client.Client):
     def __init__(self, wrapper, host=None, port=None):
         super().__init__(host, port)
         self.__wrapper = wrapper
@@ -35,7 +35,7 @@ class ConnectionClientJSON(spoke.connection.client.Client):
 
 class Client:
     def __init__(self, host=None, port=None):
-        self.__level1_client = ConnectionClientJSON(self, host, port)
+        self.__level1_client = _ConnectionClientJSON(self, host, port)
 
     async def run(self, timeout=None):
         await self.__level1_client.run(timeout=timeout)

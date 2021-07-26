@@ -6,7 +6,8 @@
 * Packaging
     * Add documentation
     * Test with older pythons and relax version requirements
-    * Add type annotations and test that runs mypy
+    * Consider adding type annotations and test that runs mypy
+* Remove timeout args from awaitables and use standard asyncio approach
 
 # Old notes
 

@@ -33,9 +33,7 @@ def echo():
     parser.add_argument("channel", nargs="*", default=["**"])
     args = parser.parse_args()
 
-    import sys
     import asyncio
-    import atexit
     import spoke
     import signal
 
@@ -84,7 +82,6 @@ def call():
 
     import json
     import spoke
-    import sys
 
     if args.body is None:
         body = args.body
@@ -95,11 +92,11 @@ def call():
         print(spoke.call(args.channel, body, timeout=args.timeout))
     except TimeoutError:
         print("Timeout")
-        sys.exit(1)
+        return 1
     except spoke.pubsub.error.RemoteCallError as e:
         msg = "Error: {}"
         print(msg.format(e))
-        sys.exit(1)
+        return 1
     return 0
 
 
@@ -136,12 +133,11 @@ def bridge():
     args = parser.parse_args()
 
     import asyncio
-    import sys
     import spoke
 
     if args.port1 == args.port2 and args.host1 == args.host2:
         print("The given arguments will bridge the server to itself. Aborting.")
-        sys.exit(1)
+        return 1
 
     def mirror(other):
         async def _inner(msg):

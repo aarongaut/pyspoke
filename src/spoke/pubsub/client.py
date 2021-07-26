@@ -2,7 +2,7 @@ import asyncio
 import spoke
 
 
-class MessageClientPubSub(spoke.message.client.Client):
+class _MessageClientPubSub(spoke.message.client.Client):
     def __init__(self, wrapper, host=None, port=None):
         super().__init__(host, port)
         self.__wrapper = wrapper
@@ -20,7 +20,7 @@ class MessageClientPubSub(spoke.message.client.Client):
 class Client:
     def __init__(self, host=None, port=None):
         self._table = spoke.pubsub.route.RoutingTable()
-        self.__level2_client = MessageClientPubSub(self, host, port)
+        self.__level2_client = _MessageClientPubSub(self, host, port)
         self.id = spoke.genid.uuid()
 
     async def run(self, timeout=None):
