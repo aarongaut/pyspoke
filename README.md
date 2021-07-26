@@ -32,7 +32,7 @@ cd pyspoke
 make
 ```
 
-To install, you can install the built wheel in `dist` using pip or simply run
+To install, you can `pip install` the built wheel in `dist` or simply run
 
 ```
 make install
