@@ -28,7 +28,10 @@ def echo():
         "--label", "-l", help="Label to include at beginning of each output"
     )
     parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Print the full message head and body"
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Print the full message head and body",
     )
     parser.add_argument("channel", nargs="*", default=["**"])
     args = parser.parse_args()
