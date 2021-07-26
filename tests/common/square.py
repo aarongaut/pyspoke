@@ -10,7 +10,7 @@ async def main():
     client = spoke.pubsub.client.Client()
     await client.run()
     await client.provide("square", square)
-    await spoke.wait.wait()
+    await spoke.wait()
 
 
 asyncio.run(main())

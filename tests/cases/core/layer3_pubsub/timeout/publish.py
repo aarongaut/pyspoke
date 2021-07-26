@@ -6,7 +6,7 @@ class TestFailure(AssertionError):
 
 
 try:
-    spoke.simple.publish("foo", None, timeout=0.5)
+    spoke.publish("foo", None, timeout=0.5)
 except TimeoutError:
     print("Got expected TimeoutError")
 else:

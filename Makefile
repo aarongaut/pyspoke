@@ -1,5 +1,11 @@
+VERSION = $(shell dev-bin/rl python -c 'from spoke.version import __version__ as v; print(v, end="")')
+
 all: dist
 .PHONY: all
+
+install: dist
+	python3 -m pip install --force-reinstall dist/pyspoke-$(VERSION).tar.gz
+.PHONY: install
 
 publish: test dist
 	python3 -m twine upload dist/*

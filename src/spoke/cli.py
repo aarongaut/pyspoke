@@ -27,7 +27,9 @@ def echo():
     parser.add_argument(
         "--label", "-l", help="Label to include at beginning of each output"
     )
-    parser.add_argument("--verbose", "-v", help="Print the full message head and body")
+    parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Print the full message head and body"
+    )
     parser.add_argument("channel", nargs="*", default=["**"])
     args = parser.parse_args()
 
@@ -63,7 +65,7 @@ def echo():
         await asyncio.gather(
             *[client.subscribe(x, echo, bounce=False) for x in args.channel]
         )
-        await spoke.wait.wait()
+        await spoke.wait()
         if ostream:
             ostream.close()
 
@@ -90,7 +92,7 @@ def call():
         body = json.loads(args.body)
 
     try:
-        print(spoke.simple.call(args.channel, body, timeout=args.timeout))
+        print(spoke.call(args.channel, body, timeout=args.timeout))
     except TimeoutError:
         print("Timeout")
         sys.exit(1)
@@ -119,7 +121,7 @@ def publish():
     else:
         body = json.loads(args.body)
 
-    spoke.simple.publish(args.channel, body, timeout=args.timeout, persist=args.persist)
+    spoke.publish(args.channel, body, timeout=args.timeout, persist=args.persist)
     return 0
 
 
@@ -157,7 +159,7 @@ def bridge():
         await client2.run()
         await client1.subscribe("**", mirror(client2))
         await client2.subscribe("**", mirror(client1))
-        await spoke.wait.wait()
+        await spoke.wait()
 
     asyncio.run(main())
     return 0

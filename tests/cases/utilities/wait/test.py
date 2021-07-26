@@ -3,7 +3,7 @@ import spoke
 
 
 async def main():
-    await spoke.wait.wait()
+    await spoke.wait()
     print("Exiting")
 
 
