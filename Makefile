@@ -8,8 +8,9 @@ install: dist
 .PHONY: install
 
 publish: test dist
-	python3 -m twine upload dist/pyspoke-$(VERSION)-py3-none-any.whl pyspoke-$(VERSION).tar.gz
+	python3 -m twine upload dist/*
 .PHONY: publish
+.NOTPARALLEL: publish
 
 clean:
 	rm -rf dist
@@ -27,5 +28,6 @@ test:
 .PHONY: test
 
 dist: $(shell find src) LICENSE pyproject.toml README.md setup.cfg
+	rm -f dist/*
 	python3 -m build
 
