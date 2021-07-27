@@ -1,4 +1,9 @@
 def server():
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
+
     import asyncio
     import spoke
 

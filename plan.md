@@ -1,13 +1,20 @@
 # TODOs
 
-* Make everything more robust
-    * Add spotty-spoke command for help with testing (repeatedly starts and stops a pubsub spoke server)
-    * Be more disciplined about when to await, create task or just make synchronous calls
 * Packaging
     * Add documentation
     * Test with older pythons and relax version requirements
     * Consider adding type annotations and test that runs mypy
+* Make everything more robust
+    * Add spotty-spoke command for help with testing (repeatedly starts and stops a pubsub spoke server)
+    * Be more disciplined about when to await, create task or just make synchronous calls
 * Remove timeout args from awaitables and use standard asyncio approach
+    * This is probably a good idea but it needs to work properly with client.call, where timeout does some cleanup
+* Think about adding await for syntax support
+    * At the very least, this could be using in layers 1 and 2 instead of `handle_recv`
+    * Could this also be applicable for reconnecting? (need to resend subscriptions for example)
+* Think about how to make the layers more customizable
+    * For example, what if we want to replace layer 1 with a websocket connection but reuse all the layer 2 json code?
+    * Can we get rid of the clunky extend and wrap business?
 
 # Old notes
 
