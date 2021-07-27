@@ -8,7 +8,7 @@ install: dist
 .PHONY: install
 
 publish: test dist
-	python3 -m twine upload dist/*
+	python3 -m twine upload dist/pyspoke-$(VERSION)-py3-none-any.whl pyspoke-$(VERSION).tar.gz
 .PHONY: publish
 
 clean:
