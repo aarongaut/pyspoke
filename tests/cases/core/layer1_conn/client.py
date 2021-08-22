@@ -7,26 +7,30 @@ name = os.getenv("name", "unnamed")
 count = int(os.getenv("count", 10))
 delay = float(os.getenv("delay", 1))
 
-
-class Client(spoke.connection.client.Client):
-    async def handle_connect(self):
-        print("Connected")
-
-    async def handle_disconnect(self):
-        print("Disconnected")
-
-    async def handle_recv(self, data):
-        print("recv: ", data.decode("utf8"))
-
+host = os.getenv("SPOKEHOST", "127.0.0.1")
+port = int(os.getenv("SPOKEPORT", 7181))
 
 async def main():
-    client = Client()
-    await client.run()
-    for i in range(count):
-        msg = "{} {}".format(name, i)
-        print("sending: {}".format(msg))
-        await client.send(msg.encode("utf8"))
-        await asyncio.sleep(delay)
+    conn = await spoke.conn.socket.Client(address=(host, port)).connect()
+    print("Connected")
 
+    async def echo(conn):
+        try:
+            async for data in conn:
+                print(f"recv: {data.decode('utf8')}")
+        except ConnectionError:
+            pass
+        print("Disconnected")
+
+    asyncio.create_task(echo(conn))
+
+    try:
+        for i in range(count):
+            msg = "{} {}".format(name, i)
+            print(f"sending: {msg}")
+            await conn.send(msg.encode("utf8"))
+            await asyncio.sleep(delay)
+    except ConnectionError:
+        pass
 
 asyncio.run(main())

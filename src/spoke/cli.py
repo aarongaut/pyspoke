@@ -161,8 +161,8 @@ def bridge():
         await client1.run()
         client2 = spoke.pubsub.client.Client(port=args.port2, host=args.host2)
         await client2.run()
-        await client1.subscribe("**", mirror(client2))
-        await client2.subscribe("**", mirror(client1))
+        await client1.subscribe("**", mirror(client2), bounce=False)
+        await client2.subscribe("**", mirror(client1), bounce=False)
         await spoke.wait()
 
     asyncio.run(main())

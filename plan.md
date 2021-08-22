@@ -15,6 +15,19 @@
 * Think about how to make the layers more customizable
     * For example, what if we want to replace layer 1 with a websocket connection but reuse all the layer 2 json code?
     * Can we get rid of the clunky extend and wrap business?
+* Bug?: a bridged spoke-server doesn't always get persistent messages when restarted
+    * Maybe its because the local server already has the message stored?
+    * Consider the case where a pair of servers are bridged and one server is resetarted. How can the bridge be made to sync up persistent messages in the restarted server?
+    * Should client store last message time on channel and avoid repeats?
+
+# Customizable layers
+
+A transport node has two components - a connection and a message packer
+
+- Connection's job is to send and receive bytes
+    - Trying to reconnect (robustness) is a higher level capability
+    - Need to handle reading and writing together on the same connection
+- Message packer converts bytes to and from messages. The type of message varies based on implementation.
 
 # Old notes
 

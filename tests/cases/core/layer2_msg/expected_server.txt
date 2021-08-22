@@ -1,14 +1,14 @@
 server.handle_connect
-server.handle_recv:  {'name': 'client1', 'value': 0}
-server.handle_recv:  {'name': 'client1', 'value': 1}
-server.handle_recv:  {'name': 'client1', 'value': 2}
+server.handle_recv: {'name': 'client1', 'value': 0}
+server.handle_recv: {'name': 'client1', 'value': 1}
+server.handle_recv: {'name': 'client1', 'value': 2}
 server.handle_connect
-server.handle_recv:  {'name': 'client2', 'value': 0}
-server.handle_recv:  {'name': 'client1', 'value': 3}
-server.handle_recv:  {'name': 'client2', 'value': 1}
-server.handle_recv:  {'name': 'client1', 'value': 4}
-server.handle_recv:  {'name': 'client2', 'value': 2}
+server.handle_recv: {'name': 'client2', 'value': 0}
+server.handle_recv: {'name': 'client1', 'value': 3}
+server.handle_recv: {'name': 'client2', 'value': 1}
+server.handle_recv: {'name': 'client1', 'value': 4}
+server.handle_recv: {'name': 'client2', 'value': 2}
 server.handle_disconnect
-server.handle_recv:  {'name': 'client2', 'value': 3}
-server.handle_recv:  {'name': 'client2', 'value': 4}
+server.handle_recv: {'name': 'client2', 'value': 3}
+server.handle_recv: {'name': 'client2', 'value': 4}
 server.handle_disconnect

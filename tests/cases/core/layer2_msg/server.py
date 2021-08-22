@@ -1,24 +1,39 @@
+import os
 import asyncio
 import spoke
 
 
-class SingleServer(spoke.message.server.SingleServer):
-    async def handle_connect(self):
-        print("server.handle_connect")
-        if "clients" not in self._context:
-            self._context["clients"] = []
-        self._context["clients"].append(self)
+host = os.getenv("SPOKEHOST", "127.0.0.1")
+port = int(os.getenv("SPOKEPORT", 7181))
 
-    async def handle_disconnect(self):
+clients = []
+
+async def handle_client(conn):
+    clients.append(conn)
+    print("server.handle_connect")
+    try:
+        async for msg in conn:
+            print(f"server.handle_recv: {msg}")
+            msg["value"] += 10
+            for client in clients:
+                await client.send(msg)
+    except ConnectionError:
+        pass
+    finally:
         print("server.handle_disconnect")
-        self._context["clients"].remove(self)
+        clients.remove(conn)
 
-    async def handle_recv(self, data):
-        print("server.handle_recv: ", data)
-        for client in self._context["clients"]:
-            await client.send(data)
+async def main():
+    async with spoke.conn.pack.Server(
+        conn_server_class = spoke.conn.socket.Server,
+        packer_class = spoke.conn.pack.JsonPacker,
+        address=(host, port),
+        reuse=True
+    ) as server:
+        async for client in server:
+            asyncio.create_task(handle_client(client))
 
-
-server = spoke.message.server.Server(single_server_class=SingleServer)
-
-asyncio.run(server.run())
+try:
+    asyncio.run(main())
+except KeyboardInterrupt:
+    pass
