@@ -2,45 +2,56 @@ import asyncio
 import spoke
 
 
-class _MessageClientPubSub(spoke.message.client.Client):
-    def __init__(self, wrapper, host=None, port=None):
-        super().__init__(host, port)
-        self.__wrapper = wrapper
-
-    async def handle_connect(self):
-        for route in self.__wrapper._table.routes:
-            await self.__wrapper.publish("-control/subscribe", route.channel())
-
-    async def handle_recv(self, json_msg):
-        msg = spoke.pubsub.msgpack.Message.unpack(json_msg)
-        for destination in self.__wrapper._table.get_destinations(msg.channel):
-            await destination(msg)
-
-
 class Client:
-    def __init__(self, host=None, port=None):
+    def __init__(self, conn_client_class=spoke.conn.socket.Client, conn_opts=None):
+        self._conn_client = spoke.conn.pack.Client(
+            conn_client_class,
+            spoke.pubsub.pack.MessagePacker,
+            conn_opts=conn_opts,
+        )
         self._table = spoke.pubsub.route.RoutingTable()
-        self.__level2_client = _MessageClientPubSub(self, host, port)
         self.id = spoke.genid.uuid()
 
-    async def run(self, timeout=None):
-        await self.__level2_client.run(timeout=timeout)
+    async def run(self):
+        async for conn in self._conn_client:
+            try:
+                subs = []
+                for route in self._table.routes:
+                    subs.append(self.publish("-control/subscribe", route.channel(), retry=False))
+                await asyncio.gather(*subs)
+                async for msg in conn:
+                    cbs = [d(msg) for d in self._table.get_destinations(msg.channel)]
+                    await asyncio.gather(*cbs)
+            except ConnectionError:
+                pass
 
-    async def publish(self, channel, body, timeout=None, **head):
-        json_msg = spoke.pubsub.msgpack.Message(channel, body, **head).pack()
-        await self.__level2_client.send(json_msg, timeout=timeout)
+    async def publish(self, channel, body, retry=True, **head):
+        """Note: retry needs to be False when publishing in a subscribe
+        callback to avoid a deadlock if the connection fails
 
-    async def subscribe(self, channel, callback, timeout=None, **head):
+        """
+        msg = spoke.pubsub.pack.Message(channel, body, **head)
+        while True:
+            conn = await self._conn_client.connection()
+            try:
+                await conn.send(msg)
+            except ConnectionError:
+                if not retry:
+                    raise
+            else:
+                break
+
+    async def subscribe(self, channel, callback, **head):
         channel = spoke.pubsub.route.canonical(channel)
-        await self.publish("-control/subscribe", channel, timeout=timeout, **head)
+        await self.publish("-control/subscribe", channel, **head)
         rule = self._table.add_rule(channel, callback)
 
-    async def unsubscribe(self, channel, timeout=None):
+    async def unsubscribe(self, channel):
         channel = spoke.pubsub.route.canonical(channel)
-        await self.publish("-control/unsubscribe", channel, timeout=timeout)
+        await self.publish("-control/unsubscribe", channel)
         rule = self._table.remove_rule(channel)
 
-    async def provide(self, channel, callback, timeout=None):
+    async def provide(self, channel, callback):
         channel = spoke.pubsub.route.canonical(channel)
 
         async def _provide(call_msg):
@@ -50,9 +61,9 @@ class Client:
                 res_body["okay"] = await callback(call_msg)
             except Exception as e:
                 res_body["error"] = str(e)
-            await self.publish(res_channel, res_body)
+            await self.publish(res_channel, res_body, retry=False)
 
-        await self.subscribe(channel + "/-rpc/**/call", _provide, timeout=timeout)
+        await self.subscribe(channel + "/-rpc/**/call", _provide)
 
     async def call(self, channel, body, timeout=None):
         future = asyncio.Future()
@@ -73,6 +84,8 @@ class Client:
                     future.set_exception(err)
                 await self.unsubscribe(sub_channel)
 
+        # TODO: remove timeout arg and somehow automatically unsubscribe
+        # if cancelled
         if timeout:
 
             async def _handle_timeout():

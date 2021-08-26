@@ -46,7 +46,7 @@ class JsonPacker(abc.AbstractPacker):
             msg_data = b"".join(self.__fragments)
             self.__messages.append(json.loads(msg_data))
             for msg_data in msg_datas:
-                self.__messages.extend(json.loads(msg_data))
+                self.__messages.append(json.loads(msg_data))
             self.__fragments = [begin_frag]
         else:
             self.__fragments.append(data)
@@ -91,8 +91,10 @@ class Connection(abc.AbstractConnection):
 
 
 class Client(abc.AbstractClient):
-    def __init__(self, conn_client_class, packer_class=TrivialPacker, **kwargs):
-        self.__conn_client = conn_client_class(**kwargs)
+    def __init__(self, conn_client_class, packer_class=TrivialPacker, conn_opts=None):
+        if conn_opts is None:
+            conn_opts = {}
+        self.__conn_client = conn_client_class(**conn_opts)
         self.__packer = packer_class()
 
     async def reset(self):
@@ -115,8 +117,10 @@ class Client(abc.AbstractClient):
 
 
 class Server(abc.AbstractServer):
-    def __init__(self, conn_server_class, packer_class=TrivialPacker, **kwargs):
-        self.__conn_server = conn_server_class(**kwargs)
+    def __init__(self, conn_server_class, packer_class=TrivialPacker, conn_opts=None):
+        if conn_opts is None:
+            conn_opts = {}
+        self.__conn_server = conn_server_class(**conn_opts)
         self.__packer_class = packer_class
 
     def __aiter__(self):

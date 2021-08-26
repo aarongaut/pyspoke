@@ -7,14 +7,10 @@ name = os.getenv("name", "unnamed")
 count = int(os.getenv("count", 10))
 delay = float(os.getenv("delay", 1))
 
-host = os.getenv("SPOKEHOST", "127.0.0.1")
-port = int(os.getenv("SPOKEPORT", 7181))
-
 async def main():
     conn = await spoke.conn.pack.Client(
         conn_client_class = spoke.conn.socket.Client,
         packer_class = spoke.conn.pack.JsonPacker,
-        address=(host, port)
     ).connect()
     print("Connected")
 

@@ -4,14 +4,11 @@ import asyncio
 import spoke
 
 name = os.getenv("name", "unnamed")
-count = int(os.getenv("count", 10))
+count = int(os.getenv("count", 1000))
 delay = float(os.getenv("delay", 1))
 
-host = os.getenv("SPOKEHOST", "127.0.0.1")
-port = int(os.getenv("SPOKEPORT", 7181))
-
 async def main():
-    conn = await spoke.conn.socket.Client(address=(host, port)).connect()
+    conn = await spoke.conn.socket.Client().connect()
     print("Connected")
 
     async def echo(conn):

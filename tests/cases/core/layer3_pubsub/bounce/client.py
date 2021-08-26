@@ -9,7 +9,7 @@ async def echo(msg):
 
 
 async def main():
-    await client.run()
+    asyncio.create_task(client.run())
     await client.subscribe("test", echo)
     await client.publish("test", 1, bounce=False)
     await client.publish("test", 2)

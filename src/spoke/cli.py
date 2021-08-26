@@ -67,7 +67,7 @@ def echo():
 
     async def main():
         client = spoke.pubsub.client.Client()
-        await client.run()
+        asyncio.create_task(client.run())
         await asyncio.gather(
             *[client.subscribe(x, echo, bounce=False) for x in args.channel]
         )
@@ -157,10 +157,10 @@ def bridge():
         return _inner
 
     async def main():
-        client1 = spoke.pubsub.client.Client(port=args.port1, host=args.host1)
-        await client1.run()
-        client2 = spoke.pubsub.client.Client(port=args.port2, host=args.host2)
-        await client2.run()
+        client1 = spoke.pubsub.client.Client(conn_opts={"port":args.port1, "host":args.host1})
+        asyncio.create_task(client1.run())
+        client2 = spoke.pubsub.client.Client(conn_opts={"port":args.port2, "host":args.host2})
+        asyncio.create_task(client2.run())
         await client1.subscribe("**", mirror(client2), bounce=False)
         await client2.subscribe("**", mirror(client1), bounce=False)
         await spoke.wait()

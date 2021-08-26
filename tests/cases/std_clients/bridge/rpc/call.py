@@ -7,7 +7,7 @@ client.id = "caller_id"
 
 
 async def main():
-    await client.run()
+    asyncio.create_task(client.run())
     future = await client.call("square", 5, timeout=1)
     await future
     print(future.result())

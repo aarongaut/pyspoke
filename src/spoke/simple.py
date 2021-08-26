@@ -7,8 +7,9 @@ These methods must not be called while another asyncio
 event loop is already running in the same thread.
 
 """
-import spoke
 import asyncio
+import os
+import spoke
 
 
 def call(channel, body, host=None, port=None, timeout=None):
@@ -24,12 +25,21 @@ def call(channel, body, host=None, port=None, timeout=None):
     See spoke.pubsub.client.Client.call for more details.
 
     """
-    client = spoke.pubsub.client.Client(host=host, port=port)
+    conn_opts = {
+        "host": host,
+        "port": port,
+    }
+    client = spoke.pubsub.client.Client(conn_opts=conn_opts)
     result = [None]
 
     async def run():
-        await client.run(timeout=timeout)
-        future = await client.call(channel, body, timeout=timeout)
+        asyncio.create_task(client.run())
+        awaitable = client.call(channel, body, timeout=timeout)
+
+        if timeout:
+            future = await asyncio.wait_for(awaitable, timeout)
+        else:
+            future = await awaitable
         await future
         result[0] = future.result()
 
@@ -51,11 +61,19 @@ def publish(channel, body, host=None, port=None, timeout=None, **head):
     See spoke.pubsub.client.Client.publish for more details.
 
     """
-    client = spoke.pubsub.client.Client(host=host, port=port)
+    conn_opts = {
+        "host": host,
+        "port": port,
+    }
+    client = spoke.pubsub.client.Client(conn_opts=conn_opts)
 
     async def run():
-        await client.run(timeout=timeout)
-        await client.publish(channel, body, timeout=timeout, **head)
+        asyncio.create_task(client.run())
+        awaitable = client.publish(channel, body, **head)
+        if timeout:
+            await asyncio.wait_for(awaitable, timeout)
+        else:
+            await awaitable
 
     try:
         asyncio.run(run())

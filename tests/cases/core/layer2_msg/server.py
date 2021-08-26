@@ -3,9 +3,6 @@ import asyncio
 import spoke
 
 
-host = os.getenv("SPOKEHOST", "127.0.0.1")
-port = int(os.getenv("SPOKEPORT", 7181))
-
 clients = []
 
 async def handle_client(conn):
@@ -27,8 +24,7 @@ async def main():
     async with spoke.conn.pack.Server(
         conn_server_class = spoke.conn.socket.Server,
         packer_class = spoke.conn.pack.JsonPacker,
-        address=(host, port),
-        reuse=True
+        conn_opts = {"reuse": True},
     ) as server:
         async for client in server:
             asyncio.create_task(handle_client(client))
