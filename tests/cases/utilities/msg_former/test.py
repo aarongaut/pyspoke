@@ -21,11 +21,11 @@ def slice_and_dice(string, seed=None):
 cases = [
     {
         "input": b"hello\x00world\x00",
-        "expected": [b"hello\x00", b"world\x00"],
+        "expected": [b"hello", b"world"],
     },
     {
         "input": b"hello\x00\x00world\x00junk",
-        "expected": [b"hello\x00", b"\x00", b"world\x00"],
+        "expected": [b"hello", b"", b"world"],
     },
 ]
 
@@ -40,12 +40,12 @@ for case in cases:
     seeds = [str(random.random()) for _ in range(reps)]
     for seed in seeds:
         fragments = slice_and_dice(case["input"], seed)
-        former = spoke.message.serialize.MessageFormer()
+        former = spoke.conn.pack.DelimitedBytePacker()
         for fragment in fragments:
-            former.add_data(fragment)
+            former.unpack(fragment)
         messages = []
-        while former.has_msg():
-            messages.append(former.pop_msg())
+        for msg in former:
+            messages.append(msg)
         if messages != case["expected"]:
             msg = 'Unexpected result {} for input {} on seed "{}", case {}.'
             raise TestFailure(msg.format(messages, fragments, seed, case))

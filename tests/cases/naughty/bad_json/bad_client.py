@@ -1,14 +1,14 @@
 import asyncio
-from spoke.connection.client import Client
+import spoke
 
 
 async def main():
-    client = Client()
-    await client.run()
+    client = spoke.conn.socket.Client()
+    conn = await client.connect()
     msg = b"junk\x00"
-    await client.send(msg)
+    await conn.send(msg)
     msg = b"\xde\xad\xbe\xef\x00"
-    await client.send(msg)
+    await conn.send(msg)
 
 
 asyncio.run(main())

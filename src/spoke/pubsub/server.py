@@ -1,39 +1,35 @@
+import json
 import time
-import spoke
 import asyncio
+import dataclasses
+import spoke
+from .route import RoutingTable
 
 
-class MessageSingleServerPubSub(spoke.message.server.SingleServer):
-    def __init__(self, wrapper, reader, writer, context):
-        super().__init__(reader, writer, context)
-        self.__wrapper = wrapper
-        self.__control_table = spoke.pubsub.route.RoutingTable()
-        self.__context = context
-        self._table = spoke.pubsub.route.RoutingTable()
+@dataclasses.dataclass
+class ClientData:
+    conn: spoke.conn.pack.Connection
+    routing_table: RoutingTable
+    control_table: RoutingTable
 
-        if "clients" not in context:
-            self.__context["clients"] = []
-        if "persist" not in context:
-            self.__context["persist"] = {}
 
-        async def _subscribe(channel):
-            if isinstance(channel, str):
-                channel = spoke.pubsub.route.canonical(channel)
-                route = self._table.add_rule(channel)
-                for pchannel, msg in self.__context["persist"].items():
-                    if route.test(spoke.pubsub.route.tokenize(pchannel)):
-                        await self.send(msg.pack())
+class Server:
+    def __init__(self, conn_server_class=spoke.conn.socket.Server, conn_opts=None):
+        self.__conn_server = spoke.conn.pack.Server(
+            conn_server_class,
+            spoke.pubsub.pack.MessagePacker,
+            conn_opts=conn_opts,
+        )
+        self.__id = spoke.genid.uuid()
+        self.__state = {}
+        self.__clients = {}
 
-        async def _unsubscribe(channel):
-            if isinstance(channel, str):
-                channel = spoke.pubsub.route.canonical(channel)
-                self._table.remove_rule(channel)
-
-        self.__control_table.add_rule("-control/subscribe", _subscribe)
-        self.__control_table.add_rule("-control/unsubscribe", _unsubscribe)
+    async def run(self):
+        async for client in self.__conn_server:
+            asyncio.create_task(self.__handle_client(client))
 
     @staticmethod
-    def massage_head(msg):
+    def __massage_head(msg):
         """Prepares a message to be published to clients. The message
         is modified in place, and a dictionary of extracted server
         hints is returned.
@@ -50,49 +46,59 @@ class MessageSingleServerPubSub(spoke.message.server.SingleServer):
             del msg.head["bounce"]
         return hints
 
-    async def handle_connect(self):
-        self._context["clients"].append(self)
-
-    async def handle_disconnect(self):
-        self._context["clients"].remove(self)
-
-    async def handle_recv(self, json_msg):
-        try:
-            msg = spoke.pubsub.msgpack.Message.unpack(json_msg)
-        except ValueError as e:
-            err_msg = "Ignoring malformed message from client: {}"
-            print(err_msg.format(e))
-        else:
-            for destination in self.__control_table.get_destinations(msg.channel):
-                await destination(msg.body)
-            hints = self.massage_head(msg)
-
-            if hints["persist"]:
-                last_msg = self.__context["persist"].get(msg.channel, None)
-                if last_msg is None or last_msg.head["time"] < hints["time"]:
-                    self.__context["persist"][msg.channel] = msg
-                elif last_msg.head["time"] > hints["time"]:
-                    # Discarding old message
-                    return
-
-            to_json_msg = msg.pack()
-            for client in self._context["clients"]:
-                if client == self and not hints["bounce"]:
-                    continue
-                if client._table.get_destinations(msg.channel):
-                    await client.send(to_json_msg)
-
-
-class SingleServer:
-    def __init__(self, reader, writer, context):
-        self.__level2_single_server = MessageSingleServerPubSub(
-            self, reader, writer, context
+    async def __handle_client(self, client):
+        client_id = spoke.genid.luid()
+        data = ClientData(
+            conn=client,
+            control_table=RoutingTable(),
+            routing_table=RoutingTable(),
         )
+        self.__clients[client_id] = data
 
-    async def run(self):
-        await self.__level2_single_server.run()
+        async def _subscribe(channel):
+            channel = spoke.pubsub.route.canonical(channel)
+            route = data.routing_table.add_rule(channel)
+            for pchannel, msg in self.__state.items():
+                if route.test(spoke.pubsub.route.tokenize(pchannel)):
+                    await client.send(msg)
 
+        async def _unsubscribe(channel):
+            channel = spoke.pubsub.route.canonical(channel)
+            data.routing_table.remove_rule(channel)
 
-class Server(spoke.message.server.Server):
-    def __init__(self, port=None, single_server_class=SingleServer):
-        super().__init__(port, single_server_class)
+        data.control_table.add_rule("-control/subscribe", _subscribe)
+        data.control_table.add_rule("-control/unsubscribe", _unsubscribe)
+
+        async def msggen():
+            while True:
+                try:
+                    msg = await client.recv()
+                except (UnicodeDecodeError, json.decoder.JSONDecodeError) as e:
+                    print(f"Ignoring malformed message from client (not valid JSON): {e}")
+                except ValueError as e:
+                    print(f"Ignoring malformed message from client: {e}")
+                else:
+                    yield msg
+
+        try:
+            async for msg in msggen():
+                for destination in data.control_table.get_destinations(msg.channel):
+                    await destination(msg.body)
+                hints = self.__massage_head(msg)
+
+                if hints["persist"]:
+                    last_msg = self.__state.get(msg.channel, None)
+                    if last_msg is None or last_msg.head["time"] < hints["time"]:
+                        self.__state[msg.channel] = msg
+                    elif last_msg.head["time"] > hints["time"]:
+                        # Discarding old message
+                        continue
+
+                for peer_id, peer_data in self.__clients.items():
+                    if peer_id == client_id and not hints["bounce"]:
+                        continue
+                    if peer_data.routing_table.get_destinations(msg.channel):
+                        await peer_data.conn.send(msg)
+
+        except ConnectionError:
+            del self.__clients[client_id]

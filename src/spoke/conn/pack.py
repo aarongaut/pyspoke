@@ -28,7 +28,7 @@ class TrivialPacker(abc.AbstractPacker):
             raise StopIteration
 
 
-class JsonPacker(abc.AbstractPacker):
+class DelimitedBytePacker(abc.AbstractPacker):
     MSG_SEP = b"\x00"
 
     def __init__(self):
@@ -36,17 +36,18 @@ class JsonPacker(abc.AbstractPacker):
         self.__messages = []
 
     def pack(self, msg):
-        msg = json.dumps(msg)
-        return msg.encode("utf8") + b"\0"
+        if self.MSG_SEP in msg:
+            raise ValueError(f"Delimiter {self.MSG_SEP} must not appear in message")
+        return msg + self.MSG_SEP
 
     def unpack(self, data):
         if self.MSG_SEP in data:
             end_frag, *msg_datas, begin_frag = data.split(self.MSG_SEP)
             self.__fragments.append(end_frag)
             msg_data = b"".join(self.__fragments)
-            self.__messages.append(json.loads(msg_data))
+            self.__messages.append(msg_data)
             for msg_data in msg_datas:
-                self.__messages.append(json.loads(msg_data))
+                self.__messages.append(msg_data)
             self.__fragments = [begin_frag]
         else:
             self.__fragments.append(data)
@@ -62,6 +63,27 @@ class JsonPacker(abc.AbstractPacker):
         if not self.__messages:
             raise StopIteration
         return self.__messages.pop(0)
+
+
+class JsonPacker(abc.AbstractPacker):
+    def __init__(self):
+        self._delimiter_packer = DelimitedBytePacker()
+
+    def pack(self, msg):
+        data = json.dumps(msg).encode("utf8")
+        return self._delimiter_packer.pack(data)
+
+    def unpack(self, data):
+        self._delimiter_packer.unpack(data)
+
+    def reset(self):
+        self._delimiter_packer.reset()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return json.loads(next(self._delimiter_packer))
 
 
 class Connection(abc.AbstractConnection):

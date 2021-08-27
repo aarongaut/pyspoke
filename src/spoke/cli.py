@@ -152,7 +152,7 @@ def bridge():
             if msg.channel.startswith("-control/"):
                 return
             msg.head["bounce"] = False
-            await other.publish(body=msg.body, **msg.head)
+            await other.publish(body=msg.body, **msg.head, retry=False)
 
         return _inner
 

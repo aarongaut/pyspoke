@@ -1,7 +1,5 @@
 from . import conn
-from . import connection
 from . import genid
-from . import message
 from . import pubsub
 from .simple import publish, call
 from .wait import wait

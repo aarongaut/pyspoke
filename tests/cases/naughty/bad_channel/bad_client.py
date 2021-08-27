@@ -1,26 +1,30 @@
 import asyncio
-from spoke.message.client import Client
+import spoke
 
 
 async def main():
-    client = Client()
-    await client.run()
+    client = spoke.conn.pack.Client(
+        conn_client_class=spoke.conn.socket.Client,
+        packer_class=spoke.conn.pack.JsonPacker,
+    )
+
+    conn = await client.connect()
     msg = {}
-    await client.send(msg)
+    await conn.send(msg)
     msg = []
-    await client.send(msg)
+    await conn.send(msg)
     msg = "junk"
-    await client.send(msg)
+    await conn.send(msg)
     msg = {"head": None}
-    await client.send(msg)
+    await conn.send(msg)
     msg = {"head": {}}
-    await client.send(msg)
+    await conn.send(msg)
     msg = {
         "head": {
             "channel": ["this", "is", "junk"],
         },
     }
-    await client.send(msg)
+    await conn.send(msg)
 
 
 asyncio.run(main())

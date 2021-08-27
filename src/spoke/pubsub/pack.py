@@ -17,6 +17,9 @@ class Message:
             raise ValueError("channel is not a string")
         self.head["channel"] = spoke.pubsub.route.canonical(value)
 
+    def __repr__(self):
+        return f"Message(head={self.head}, body={self.body})"
+
 
 class MessagePacker(spoke.conn.abc.AbstractPacker):
     def __init__(self):
