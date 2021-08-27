@@ -19,6 +19,7 @@ class AbstractConnection(ABC):
     def __aiter__(self):
         pass
 
+
 class AbstractClient(ABC):
     @abstractmethod
     async def connect(self) -> AbstractConnection:
@@ -53,6 +54,7 @@ class AbstractPacker(ABC):
     @abstractmethod
     def reset(self):
         pass
+
 
 class AbstractServer(ABC):
     @abstractmethod

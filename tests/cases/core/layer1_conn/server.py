@@ -5,6 +5,7 @@ import spoke
 
 clients = []
 
+
 async def handle_client(conn):
     clients.append(conn)
     print("server.handle_connect")
@@ -19,10 +20,12 @@ async def handle_client(conn):
         print("server.handle_disconnect")
         clients.remove(conn)
 
+
 async def main():
     async with spoke.conn.socket.Server(reuse=True) as server:
         async for client in server:
             asyncio.create_task(handle_client(client))
+
 
 try:
     asyncio.run(main())

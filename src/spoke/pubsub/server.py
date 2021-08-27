@@ -1,5 +1,3 @@
-import json
-import time
 import asyncio
 import dataclasses
 import spoke
@@ -74,7 +72,9 @@ class Server:
                 try:
                     msg = await client.recv()
                 except (UnicodeDecodeError, json.decoder.JSONDecodeError) as e:
-                    print(f"Ignoring malformed message from client (not valid JSON): {e}")
+                    print(
+                        f"Ignoring malformed message from client (not valid JSON): {e}"
+                    )
                 except ValueError as e:
                     print(f"Ignoring malformed message from client: {e}")
                 else:

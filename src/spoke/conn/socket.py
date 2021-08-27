@@ -10,6 +10,7 @@ from . import abc
 
 DEFAULT_PORT = 7181
 
+
 class Connection(abc.AbstractConnection):
     RECV_BYTES = 2048
 
@@ -77,7 +78,9 @@ class Client(abc.AbstractClient):
         await self.reset()
         loop = asyncio.get_running_loop()
         while True:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM | socket.SOCK_NONBLOCK)
+            sock = socket.socket(
+                socket.AF_INET, socket.SOCK_STREAM | socket.SOCK_NONBLOCK
+            )
             try:
                 await loop.sock_connect(sock, self._address)
                 conn = Connection(sock)
@@ -111,7 +114,9 @@ class Server(abc.AbstractServer):
     def __init__(self, host=None, port=None, reuse=False):
         host = host or "0.0.0.0"
         port = port or int(os.getenv("SPOKEPORT", DEFAULT_PORT))
-        self.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM | socket.SOCK_NONBLOCK)
+        self.__sock = socket.socket(
+            socket.AF_INET, socket.SOCK_STREAM | socket.SOCK_NONBLOCK
+        )
         if reuse:
             self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.__sock.bind((host, port))

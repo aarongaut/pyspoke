@@ -7,10 +7,11 @@ name = os.getenv("name", "unnamed")
 count = int(os.getenv("count", 10))
 delay = float(os.getenv("delay", 1))
 
+
 async def main():
     conn = await spoke.conn.pack.Client(
-        conn_client_class = spoke.conn.socket.Client,
-        packer_class = spoke.conn.pack.JsonPacker,
+        conn_client_class=spoke.conn.socket.Client,
+        packer_class=spoke.conn.pack.JsonPacker,
     ).connect()
     print("Connected")
 
@@ -32,5 +33,6 @@ async def main():
             await asyncio.sleep(delay)
     except ConnectionError:
         pass
+
 
 asyncio.run(main())

@@ -17,7 +17,9 @@ class Client:
             try:
                 subs = []
                 for route in self._table.routes:
-                    subs.append(self.publish("-control/subscribe", route.channel(), retry=False))
+                    subs.append(
+                        self.publish("-control/subscribe", route.channel(), retry=False)
+                    )
                 await asyncio.gather(*subs)
                 async for msg in conn:
                     cbs = [d(msg) for d in self._table.get_destinations(msg.channel)]
