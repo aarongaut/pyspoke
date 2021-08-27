@@ -2,8 +2,8 @@ set -e
 rm -rf artifacts
 mkdir -p artifacts
 
-port1=$(../../../../common/find-free-port)
-port2=$(../../../../common/find-free-port)
+port1=$(../../../../../common/find-free-port)
+port2=$(../../../../../common/find-free-port)
 
 printf "Starting server1 on port $port1\n"
 PYTHONUNBUFFERED=1 SPOKEPORT=$port1 spoke-server &

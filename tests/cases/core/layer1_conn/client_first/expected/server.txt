@@ -1,0 +1,7 @@
+server.handle_connect
+server.handle_recv: b'client1 0'
+server.handle_recv: b'client1 1'
+server.handle_recv: b'client1 2'
+server.handle_recv: b'client1 3'
+server.handle_recv: b'client1 4'
+server.handle_disconnect

@@ -65,6 +65,7 @@ class Client(abc.AbstractClient):
         elif self._connection.done():
             try:
                 await self._connection.result().close()
+                self._connection = loop.create_future()
             except ConnectionError:
                 pass
 

@@ -92,7 +92,7 @@ class Server:
                     last_msg = self.__state.get(msg.channel, None)
                     if last_msg is None or last_msg.head["time"] < hints["time"]:
                         self.__state[msg.channel] = msg
-                    elif last_msg.head["time"] > hints["time"]:
+                    elif last_msg.head["time"] >= hints["time"]:
                         # Discarding old message
                         continue
 

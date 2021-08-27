@@ -9,7 +9,7 @@ class TestFailure(AssertionError):
 
 async def main():
     client = Client()
-    asyncio.create_task(client.run())
+    await client.run()
     val = await client.call("invert", 0)
     try:
         await val

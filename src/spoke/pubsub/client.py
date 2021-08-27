@@ -3,7 +3,7 @@ import spoke
 
 
 class Client:
-    def __init__(self, conn_client_class=spoke.conn.socket.Client, conn_opts=None):
+    def __init__(self, conn_client_class=spoke.conn.socket.Client, conn_opts=None, on_connect=None):
         self._conn_client = spoke.conn.pack.Client(
             conn_client_class,
             spoke.pubsub.pack.MessagePacker,
@@ -11,21 +11,26 @@ class Client:
         )
         self._table = spoke.pubsub.route.RoutingTable()
         self.id = spoke.genid.uuid()
+        self._on_connect = on_connect
 
     async def run(self):
-        async for conn in self._conn_client:
-            try:
-                subs = []
-                for route in self._table.routes:
-                    subs.append(
-                        self.publish("-control/subscribe", route.channel(), retry=False)
-                    )
-                await asyncio.gather(*subs)
-                async for msg in conn:
-                    cbs = [d(msg) for d in self._table.get_destinations(msg.channel)]
-                    await asyncio.gather(*cbs)
-            except ConnectionError:
-                pass
+        async def _run():
+            async for conn in self._conn_client:
+                try:
+                    if self._on_connect:
+                        await self._on_connect(conn)
+                    subs = []
+                    for route in self._table.routes:
+                        subs.append(
+                            self.publish("-control/subscribe", route.channel(), retry=False)
+                        )
+                    await asyncio.gather(*subs)
+                    async for msg in conn:
+                        cbs = [d(msg) for d in self._table.get_destinations(msg.channel)]
+                        await asyncio.gather(*cbs)
+                except ConnectionError:
+                    pass
+        asyncio.create_task(_run())
 
     async def publish(self, channel, body, retry=True, **head):
         """Note: retry needs to be False when publishing in a subscribe

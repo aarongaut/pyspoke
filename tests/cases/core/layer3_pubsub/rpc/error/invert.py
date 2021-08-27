@@ -8,7 +8,7 @@ async def invert(msg):
 
 async def main():
     client = spoke.pubsub.client.Client()
-    asyncio.create_task(client.run())
+    await client.run()
     await client.provide("invert", invert)
     await spoke.wait()
 

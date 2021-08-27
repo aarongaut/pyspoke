@@ -2,12 +2,16 @@ def server():
     import argparse
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("-r", "--reuse", action="store_true", help="Allow reuse of the server socket by setting SO_REUSEADDR")
     args = parser.parse_args()
 
     import asyncio
     import spoke
 
-    server = spoke.pubsub.server.Server()
+    conn_opts = {
+        "reuse": args.reuse,
+    }
+    server = spoke.pubsub.server.Server(conn_opts=conn_opts)
 
     try:
         asyncio.run(server.run())
@@ -67,7 +71,7 @@ def echo():
 
     async def main():
         client = spoke.pubsub.client.Client()
-        asyncio.create_task(client.run())
+        await client.run()
         await asyncio.gather(
             *[client.subscribe(x, echo, bounce=False) for x in args.channel]
         )
@@ -147,24 +151,34 @@ def bridge():
         print("The given arguments will bridge the server to itself. Aborting.")
         return 1
 
+    state = {}
+
+    async def on_connect(conn):
+        for msg in state.values():
+            await conn.send(msg)
+
     def mirror(other):
         async def _inner(msg):
             if msg.channel.startswith("-control/"):
                 return
             msg.head["bounce"] = False
+            if msg.head.get("persist", True):
+                state[msg.channel] = msg
             await other.publish(body=msg.body, **msg.head, retry=False)
 
         return _inner
 
     async def main():
         client1 = spoke.pubsub.client.Client(
-            conn_opts={"port": args.port1, "host": args.host1}
+            conn_opts={"port": args.port1, "host": args.host1},
+            on_connect=on_connect,
         )
-        asyncio.create_task(client1.run())
+        await client1.run()
         client2 = spoke.pubsub.client.Client(
-            conn_opts={"port": args.port2, "host": args.host2}
+            conn_opts={"port": args.port2, "host": args.host2},
+            on_connect=on_connect,
         )
-        asyncio.create_task(client2.run())
+        await client2.run()
         await client1.subscribe("**", mirror(client2), bounce=False)
         await client2.subscribe("**", mirror(client1), bounce=False)
         await spoke.wait()
