@@ -1,7 +1,3 @@
-import time
-import uuid
-
-
 import os
 import asyncio
 import socket
@@ -17,7 +13,6 @@ class Connection(abc.AbstractConnection):
     def __init__(self, sock):
         self.__sock = sock
         self.__connected = True
-        self.__id = str(uuid.uuid4())[:4]
 
     async def send(self, data: bytes):
         if not self.__connected:

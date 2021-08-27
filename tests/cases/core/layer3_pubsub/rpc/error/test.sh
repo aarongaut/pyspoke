@@ -27,8 +27,8 @@ kill -15 $INVERT_PID
 printf "Waiting for everything to shutdown\n"
 wait
 
-printf "Diffing output - <exp >got\n"
-diff expected.txt artifacts/output.txt
+printf "Diffing output - <got >exp\n"
+diff -r artifacts expected
 exitcode=$?
 
 exit $exitcode

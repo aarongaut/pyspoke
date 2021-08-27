@@ -47,10 +47,8 @@ kill -15 $SERVER1_PID $SERVER2_PID $ECHO1_PID $ECHO2_PID $SQUARE_PID $BRIDGE_PID
 printf "Waiting for everything to shutdown\n"
 wait
 
-printf "Diffing output - <exp >got\n"
-diff expected/echo1.txt artifacts/echo1.txt &&
-diff expected/echo2.txt artifacts/echo2.txt &&
-diff expected/call.txt artifacts/call.txt
+printf "Diffing output - <got >exp\n"
+diff -r artifacts expected
 exitcode=$?
 
 exit $exitcode
