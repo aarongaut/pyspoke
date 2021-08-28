@@ -69,7 +69,7 @@ class Client:
 
         await self.subscribe(channel + "/-rpc/**/call", _provide)
 
-    async def call(self, channel, body, timeout=None):
+    async def call(self, channel, body):
         future = asyncio.Future()
         channel = spoke.pubsub.route.canonical(channel)
         channel_head = "/".join([channel, "-rpc", self.id, spoke.genid.luid()])
@@ -77,29 +77,22 @@ class Client:
         sub_channel = "/".join([channel_head, "result"])
 
         async def _handle_response(res_msg):
-            if not future.done():
-                if "okay" in res_msg.body:
-                    future.set_result(res_msg.body["okay"])
-                elif "error" in res_msg.body:
-                    err = spoke.pubsub.error.RemoteCallError(res_msg.body["error"])
-                    future.set_exception(err)
-                else:
-                    err = spoke.pubsub.error.RemoteCallError("Malformed response")
-                    future.set_exception(err)
+            if "okay" in res_msg.body:
+                future.set_result(res_msg.body["okay"])
+            elif "error" in res_msg.body:
+                err = spoke.pubsub.error.RemoteCallError(res_msg.body["error"])
+                future.set_exception(err)
+            else:
+                err = spoke.pubsub.error.RemoteCallError("Malformed response")
+                future.set_exception(err)
+
+        subscribed = False
+        try:
+            await self.subscribe(sub_channel, _handle_response)
+            subscribed = True
+            await self.publish(pub_channel, body)
+            await future
+            return future.result()
+        finally:
+            if subscribed:
                 await self.unsubscribe(sub_channel)
-
-        # TODO: remove timeout arg and somehow automatically unsubscribe
-        # if cancelled
-        if timeout:
-
-            async def _handle_timeout():
-                await asyncio.sleep(timeout)
-                if not future.done():
-                    future.set_exception(TimeoutError())
-                    await self.unsubscribe(sub_channel)
-
-            asyncio.create_task(_handle_timeout())
-
-        await self.subscribe(sub_channel, _handle_response)
-        await self.publish(pub_channel, body)
-        return future

@@ -10,9 +10,8 @@ class TestFailure(AssertionError):
 async def main():
     client = Client()
     await client.run()
-    val = await client.call("invert", 0)
     try:
-        await val
+        val = await client.call("invert", 0)
     except RemoteCallError as e:
         msg = "Got expected error: {}"
         print(msg.format(e))

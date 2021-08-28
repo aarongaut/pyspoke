@@ -8,8 +8,7 @@ async def main():
     client = Client()
     await client.run()
     val = await client.call("square", arg)
-    await val
-    print("{}**2 = {}".format(arg, val.result()))
+    print("{}**2 = {}".format(arg, val))
 
 
 asyncio.run(main())

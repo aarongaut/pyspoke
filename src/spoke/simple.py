@@ -34,7 +34,7 @@ def call(channel, body, host=None, port=None, timeout=None):
 
     async def run():
         asyncio.create_task(client.run())
-        awaitable = client.call(channel, body, timeout=timeout)
+        awaitable = client.call(channel, body)
 
         if timeout:
             future = await asyncio.wait_for(awaitable, timeout)
