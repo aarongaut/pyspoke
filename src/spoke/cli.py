@@ -164,7 +164,7 @@ def bridge():
             msg.head["bounce"] = False
             if msg.head.get("persist", True):
                 state[msg.channel] = msg
-            await other.publish(body=msg.body, **msg.head, retry=False)
+            await other.publish(body=msg.body, **msg.head)
 
         return _inner
 

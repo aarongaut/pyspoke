@@ -12,6 +12,7 @@ class Client:
         self._table = spoke.pubsub.route.RoutingTable()
         self.id = spoke.genid.uuid()
         self._on_connect = on_connect
+        self._recv_task = None
 
     async def run(self):
         async def _run():
@@ -22,7 +23,7 @@ class Client:
                     subs = []
                     for route in self._table.routes:
                         subs.append(
-                            self.publish("-control/subscribe", route.channel(), retry=False)
+                            self.publish("-control/subscribe", route.channel())
                         )
                     await asyncio.gather(*subs)
                     async for msg in conn:
@@ -30,20 +31,16 @@ class Client:
                         await asyncio.gather(*cbs)
                 except ConnectionError:
                     pass
-        asyncio.create_task(_run())
+        self._recv_task = asyncio.create_task(_run())
 
-    async def publish(self, channel, body, retry=True, **head):
-        """Note: retry needs to be False when publishing in a subscribe
-        callback to avoid a deadlock if the connection fails
-
-        """
+    async def publish(self, channel, body, **head):
         msg = spoke.pubsub.pack.Message(channel, body, **head)
         while True:
             conn = await self._conn_client.connection()
             try:
                 await conn.send(msg)
             except ConnectionError:
-                if not retry:
+                if asyncio.current_task() is self._recv_task:
                     raise
             else:
                 break
@@ -68,7 +65,7 @@ class Client:
                 res_body["okay"] = await callback(call_msg)
             except Exception as e:
                 res_body["error"] = str(e)
-            await self.publish(res_channel, res_body, retry=False)
+            await self.publish(res_channel, res_body)
 
         await self.subscribe(channel + "/-rpc/**/call", _provide)
 
