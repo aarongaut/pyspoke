@@ -4,7 +4,7 @@ import asyncio
 import spoke
 
 name = os.getenv("name", "unnamed")
-count = int(os.getenv("count", 1000))
+count = int(os.getenv("count", 10))
 delay = float(os.getenv("delay", 1))
 
 
