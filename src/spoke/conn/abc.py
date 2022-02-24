@@ -19,6 +19,14 @@ class AbstractConnection(ABC):
     def __aiter__(self):
         pass
 
+    @abstractmethod
+    async def __aenter__(self):
+        pass
+
+    @abstractmethod
+    async def __aexit__(self):
+        pass
+
 
 class AbstractClient(ABC):
     @abstractmethod

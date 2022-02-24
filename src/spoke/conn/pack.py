@@ -111,6 +111,12 @@ class Connection(abc.AbstractConnection):
     async def __anext__(self):
         return await self.recv()
 
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        await self.close()
+
 
 class Client(abc.AbstractClient):
     def __init__(self, conn_client_class, packer_class=TrivialPacker, conn_opts=None):

@@ -31,6 +31,8 @@ class Client:
                         await asyncio.gather(*cbs)
                 except ConnectionError:
                     pass
+                finally:
+                    await conn.close()
         self._recv_task = asyncio.create_task(_run())
 
     async def publish(self, channel, body, **head):

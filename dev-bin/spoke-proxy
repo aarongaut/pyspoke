@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+from spoke.cli import proxy
+
+proxy()

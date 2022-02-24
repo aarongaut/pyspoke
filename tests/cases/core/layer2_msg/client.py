@@ -9,30 +9,31 @@ delay = float(os.getenv("delay", 1))
 
 
 async def main():
-    conn = await spoke.conn.pack.Client(
+    client = spoke.conn.pack.Client(
         conn_client_class=spoke.conn.socket.Client,
         packer_class=spoke.conn.pack.JsonPacker,
-    ).connect()
-    print("Connected")
+    )
+    async with await client.connect() as conn:
+        print("Connected")
 
-    async def echo(conn):
+        async def echo(conn):
+            try:
+                async for msg in conn:
+                    print(f"recv value: {msg['value']}")
+            except ConnectionError:
+                pass
+            print("Disconnected")
+
+        asyncio.create_task(echo(conn))
+
         try:
-            async for msg in conn:
-                print(f"recv value: {msg['value']}")
+            for i in range(count):
+                msg = {"name": name, "value": i}
+                print(f"sending: {msg['value']}")
+                await conn.send(msg)
+                await asyncio.sleep(delay)
         except ConnectionError:
             pass
-        print("Disconnected")
-
-    asyncio.create_task(echo(conn))
-
-    try:
-        for i in range(count):
-            msg = {"name": name, "value": i}
-            print(f"sending: {msg['value']}")
-            await conn.send(msg)
-            await asyncio.sleep(delay)
-    except ConnectionError:
-        pass
 
 
 asyncio.run(main())
