@@ -102,6 +102,23 @@ import spoke
 spoke.publish("foo", 5)
 ```
 
+### Connection options
+
+By default, clients assume the server is at `localhost:7181`; the server binds to `0.0.0.0:7181`.
+The defaults may be changed:
+```python
+# server and client-subscriber are configured inside a map, the named argument conn_opts:
+server = spoke.pubsub.server.Server(conn_opts = {"host": "localhost", "port": 4444, "reuse": True})
+server = spoke.pubsub.server.Server(conn_opts = {"reuse": True})
+
+client = spoke.pubsub.client.Client(conn_opts = {"host": "spoke", "port": 8888})
+client = spoke.pubsub.client.Client(conn_opts = {"host": "spoke"})
+
+# the publisher is different; it takes host and port themselves as named arguments:
+spoke.publish('world', 'Hello!', host="spoke", port=8888)
+spoke.publish('dazai', 'BSD', port=8888)
+```
+
 # Command line interface
 
 This package provides serveral command line scripts for common tasks. For help on any of them, run with the flag `-h`:
