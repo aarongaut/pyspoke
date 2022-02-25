@@ -18,7 +18,7 @@ class Message:
         self.head["channel"] = spoke.pubsub.route.canonical(value)
 
     def __repr__(self):
-        return f"Message(head={self.head}, body={self.body})"
+        return f"Message(head={repr(self.head)}, body={repr(self.body)})"
 
 
 class MessagePacker(spoke.conn.abc.AbstractPacker):
