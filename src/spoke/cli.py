@@ -2,7 +2,12 @@ def server():
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-r", "--reuse", action="store_true", help="Allow reuse of the server socket by setting SO_REUSEADDR")
+    parser.add_argument(
+        "-r",
+        "--reuse",
+        action="store_true",
+        help="Allow reuse of the server socket by setting SO_REUSEADDR",
+    )
     args = parser.parse_args()
 
     import asyncio
@@ -185,6 +190,7 @@ def bridge():
 
     asyncio.run(main())
     return 0
+
 
 def proxy():
     import argparse

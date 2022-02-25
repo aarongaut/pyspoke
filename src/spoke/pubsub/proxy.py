@@ -15,7 +15,14 @@ class ClientData:
 
 
 class Server:
-    def __init__(self, allowed_channels, conn_client_class=spoke.conn.socket.Client, conn_client_opts=None, conn_server_class=spoke.conn.socket.Server, conn_server_opts=None):
+    def __init__(
+        self,
+        allowed_channels,
+        conn_client_class=spoke.conn.socket.Client,
+        conn_client_opts=None,
+        conn_server_class=spoke.conn.socket.Server,
+        conn_server_opts=None,
+    ):
         self.__conn_server = spoke.conn.pack.Server(
             conn_server_class,
             spoke.pubsub.pack.MessagePacker,
