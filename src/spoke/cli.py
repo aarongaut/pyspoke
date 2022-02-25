@@ -56,7 +56,7 @@ def echo():
 
     async def echo(msg):
         if args.verbose:
-            msg_text = str(msg.pack())
+            msg_text = str(msg)
         else:
             msg_text = "{}: {}".format(msg.channel, msg.body)
         if args.label:
