@@ -38,7 +38,8 @@ class Server:
         await self.__proxy_client.run()
 
         async def _handle_proxy_client_msg(msg):
-            self.__state[msg.channel] = msg
+            if msg.get("persist", False):
+                self.__state[msg.channel] = msg
             for client_id, client_data in self.__clients.items():
                 if client_data.routing_table.get_destinations(msg.channel):
                     await client_data.conn.send(msg)
