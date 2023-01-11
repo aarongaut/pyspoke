@@ -30,24 +30,22 @@ def call(channel, body, host=None, port=None, timeout=None):
         "port": port,
     }
     client = spoke.pubsub.client.Client(conn_opts=conn_opts)
-    result = [None]
+    result = None
 
     async def run():
+        nonlocal result
         asyncio.create_task(client.run())
         awaitable = client.call(channel, body)
 
         if timeout:
-            future = await asyncio.wait_for(awaitable, timeout)
-        else:
-            future = await awaitable
-        await future
-        result[0] = future.result()
+            awaitable = asyncio.wait_for(awaitable, timeout)
+        result = await awaitable
 
     try:
         asyncio.run(run())
     except asyncio.TimeoutError as e:
         raise TimeoutError from e
-    return result[0]
+    return result
 
 
 def publish(channel, body, host=None, port=None, timeout=None, **head):
